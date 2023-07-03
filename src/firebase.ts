@@ -50,7 +50,7 @@ export function useAuth(): IAuth {
             const adminsRef = ref(database, "admins");
             get(adminsRef).then(snapshot => {
                 if (snapshot.exists()) {
-                    const admins = snapshot.val();
+                    const admins = Object.values(snapshot.val());
                     if (admins.includes(user.uid))
                         setAuthState((prev) => ({
                             ...prev,

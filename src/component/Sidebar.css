@@ -1,9 +1,13 @@
+:root {
+    --menu-rounding: 2rem;
+}
+
 .menu {
     width: 90vw;
     height: 100vh;
     background-color: #282828;
     border-right: 2px solid #3e3e3e;
-    border-radius: 0 1rem 1rem 0;
+    border-radius: 0 var(--menu-rounding) var(--menu-rounding) 0;
     position: absolute;
     top: 0;
     left: 0;
@@ -47,6 +51,7 @@
     background-color: #a4917b;
     color: #fff;
     position: relative;
+    border-radius: 0 var(--menu-rounding) 0 0;
 }
 
 .menu__title {
@@ -78,14 +83,14 @@
 
 .menu__btn-sign-in-out, .menu__btn-request {
     width: 100%;
-    background-color: #6b6b6b;
-    color: #fff;
-    font-size: 1.2rem;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
     margin-top: .5rem;
+}
+
+.rqa-modal-content {
+    display: flex;
+    flex-direction: column;
+    /*align-items: center;*/
+    gap: 1rem;
 }
 
 @media screen and (min-width: 768px) {
@@ -94,6 +99,11 @@
         position: static;
         transform: none;
         transition: none;
+        border-radius: 0;
+    }
+
+    .menu__header {
+        border-radius: 0;
     }
 
     .menu__btn-open, .menu__btn-close {

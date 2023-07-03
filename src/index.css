@@ -1,3 +1,11 @@
+:root {
+    --btn-primary: #6b6b6b;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 html, body {
     height: 100%;
     width: 100%;
@@ -32,4 +40,29 @@ body {
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+    background-color: var(--btn-primary);
+    color: #fff;
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+button:disabled {
+    background-color: #ccc;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+code {
+    display: inline-block;
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+    background: #eee;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.5rem;
+    margin-top: .3rem;
 }
