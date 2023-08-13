@@ -1,15 +1,29 @@
 import './App.css';
 import Sidebar from "./component/Sidebar";
 import {useAuth} from "./firebase";
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
 
 export default function App() {
     const {loggedIn, role} = useAuth();
+
+    const router = createBrowserRouter([
+        {
+            path: "/",
+            element: <AuthorizedScreen/>,
+            children: [
+                {
+                    path: "/iam",
+                    element: <IAM/>
+                },
+            ]
+        }
+    ])
 
     return (
         <div className="body">
             <Sidebar/>
             <main className="main">
-                {(loggedIn && role === "admin") ? <AuthorizedScreen/> : <UnauthorizedScreen/>}
+                {(loggedIn && role === "admin") ? <RouterProvider router={router}/> : <UnauthorizedScreen/>}
             </main>
         </div>
     );
@@ -33,6 +47,10 @@ function AuthorizedScreen() {
             <TODOs/>
         </>
     );
+}
+
+function IAM() {
+    return (<></>) // TODO: implement
 }
 
 function TODOs() {

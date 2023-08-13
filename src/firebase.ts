@@ -5,9 +5,9 @@ import {getStorage} from "firebase/storage";
 import {useEffect, useState} from "react";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAz6R00lLWRFC64dBmxQOHmrqtbSPivrV8",
-    authDomain: "johirmisszio.firebaseapp.com",
-    databaseURL: "https://johirmisszio-default-rtdb.europe-west1.firebasedatabase.app",
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+    databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
     projectId: "johirmisszio",
     storageBucket: "johirmisszio.appspot.com",
     messagingSenderId: "961463867363",
@@ -50,14 +50,19 @@ export function useAuth(): IAuth {
             const adminsRef = ref(database, "admins");
             get(adminsRef).then(snapshot => {
                 if (snapshot.exists()) {
-                    const admins = Object.values(snapshot.val());
-                    if (admins.includes(user.uid))
+                    if (snapshot.hasChild(user.uid))
                         setAuthState((prev) => ({
                             ...prev,
                             role: "admin"
                         }));
                 }
             }).catch(console.error);
+
+            /*console.info("User logged in:", {
+                user,
+                token: user?.getIdToken(),
+                role: authState.role
+            });*/
 
             setAuthState((prev) => ({
                 ...prev,

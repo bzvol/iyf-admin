@@ -1,12 +1,13 @@
 import React, {useState} from "react";
 import {auth, provider, useAuth} from "../firebase";
 import {signInWithPopup, User} from "firebase/auth";
-import "./Sidebar.css";
+import "../styles/Sidebar.css";
 import unknownProfilePic from "../assets/unknownProfilePic.png"
 import {Close, Menu} from "@mui/icons-material";
 import {useMediaQuery} from "@mui/material";
 import Modal from "./Modal";
 import axios from "axios";
+import {Link} from "react-router-dom";
 
 export default function Sidebar() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -29,6 +30,13 @@ export default function Sidebar() {
                 </div>
 
                 <Profile/>
+
+                <nav className="menu__nav"><ul>
+                    {/*<li><Link to="analytics">Analytics</Link></li>*/}
+                    <li><Link to="iam">IAM</Link></li>
+                    {/*<li><Link to="main-page-content">Main page</Link></li>*/}
+                    {/*<li><Link to="file-content">Books & other files</Link></li>*/}
+                </ul></nav>
             </aside>
 
             <button className={`menu__btn-open ${menuOpen && "menu__btn-hidden"}`} onClick={() => setMenuOpen(true)}>

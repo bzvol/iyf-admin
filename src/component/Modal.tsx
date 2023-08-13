@@ -1,4 +1,4 @@
-import './Modal.css';
+import '../styles/Modal.css';
 import React, {ReactNode} from "react";
 
 export default function Modal({children, isOpen, onClose}: ModalProps) {
