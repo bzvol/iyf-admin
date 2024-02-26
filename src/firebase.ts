@@ -1,31 +1,35 @@
 import {initializeApp} from "firebase/app";
 import {getAuth, GoogleAuthProvider, User} from "firebase/auth";
-import {get, getDatabase, ref} from "firebase/database";
-import {getStorage} from "firebase/storage";
 import {useEffect, useState} from "react";
+import axios from "axios";
+import apiUrls from "./api";
 
 const firebaseConfig = {
-    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-    databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
-    projectId: "johirmisszio",
-    storageBucket: "johirmisszio.appspot.com",
-    messagingSenderId: "961463867363",
-    appId: "1:961463867363:web:cd2e952d39cc61fd47b2d6",
-    measurementId: "G-62KRMZG5SY"
+    apiKey: "AIzaSyBh6uKx5gRKrjnLPxZthaiF38_U92yNU7w",
+    authDomain: "iyfhu-caaf9.firebaseapp.com",
+    projectId: "iyfhu-caaf9",
+    storageBucket: "iyfhu-caaf9.appspot.com",
+    messagingSenderId: "452082197799",
+    appId: "1:452082197799:web:044f10863739db2281f502"
 };
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
-export const database = getDatabase(app);
-export const storage = getStorage(app);
 
 interface IAuth {
     user: User | null;
     loading: boolean;
     loggedIn: boolean;
-    role: "guest" | "admin";
+    accessRequested: boolean;
+    admin: boolean;
+    roles: IRoles;
+}
+
+export interface IRoles {
+    contentManager: boolean;
+    guestManager: boolean;
+    accessManager: boolean;
 }
 
 export function useAuth(): IAuth {
@@ -33,43 +37,50 @@ export function useAuth(): IAuth {
         user: null,
         loading: true,
         loggedIn: false,
-        role: "guest"
+        accessRequested: false,
+        admin: false,
+        roles: {
+            contentManager: false,
+            guestManager: false,
+            accessManager: false
+        }
     });
 
-    useEffect(() => {
-        return auth.onAuthStateChanged((user) => {
-            setAuthState({
+    useEffect(() =>
+        auth.onAuthStateChanged(async (user) => {
+            setAuthState((prev) => ({
+                ...prev,
                 user: user,
                 loading: true,
                 loggedIn: !!user,
-                role: "guest"
-            });
+            }));
 
             if (!user) return;
 
-            const adminsRef = ref(database, "admins");
-            get(adminsRef).then(snapshot => {
-                if (snapshot.exists()) {
-                    if (snapshot.hasChild(user.uid))
-                        setAuthState((prev) => ({
-                            ...prev,
-                            role: "admin"
-                        }));
-                }
-            }).catch(console.error);
+            let token = await user.getIdTokenResult();
+            let claims = token.claims;
 
-            /*console.info("User logged in:", {
-                user,
-                token: user?.getIdToken(),
-                role: authState.role
-            });*/
+            if (user.metadata.creationTime === user.metadata.lastSignInTime && 'admin' !in claims) try {
+                await axios.post(apiUrls.users.setDefaultClaims(user.uid));
+
+                token = await user.getIdTokenResult(true);
+                claims = token.claims;
+            } catch (err) {
+                console.error("Error while setting default claims: ", err);
+            }
 
             setAuthState((prev) => ({
                 ...prev,
-                loading: false
+                loading: false,
+                accessRequested: claims.accessRequested,
+                admin: claims.admin || claims.contentManager || claims.guestManager || claims.accessManager,
+                roles: {
+                    contentManager: claims.contentManager,
+                    guestManager: claims.guestManager,
+                    accessManager: claims.accessManager
+                }
             }));
-        });
-    }, []);
+        }), []);
 
     return authState;
 }

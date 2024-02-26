@@ -1,9 +1,9 @@
-import '../styles/Modal.css';
+import './styles/Modal.scss';
 import React, {ReactNode} from "react";
 
-export default function Modal({children, isOpen, onClose}: ModalProps) {
+export default function Modal({children, isOpen, onClose, dismissible = true}: ModalProps) {
     const handleBackgroundClick: React.MouseEventHandler<HTMLDivElement> = event => {
-        if (event.target === event.currentTarget) onClose?.();
+        if (event.target === event.currentTarget && dismissible) onClose?.();
     }
 
     return (
@@ -19,4 +19,5 @@ interface ModalProps {
     children: ReactNode;
     isOpen: boolean;
     onClose?: () => void;
+    dismissible?: boolean;
 }

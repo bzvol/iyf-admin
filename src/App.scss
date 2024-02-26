@@ -1,0 +1,42 @@
+@import 'variables';
+
+body {
+    background-color: #f3f3f3;
+}
+
+.body {
+    display: flex;
+}
+
+.main-wrapper {
+    flex: 1;
+}
+
+.small-screen-header {
+    background: $bg-primary-color;
+    color: white;
+    padding: .75rem .5rem;
+    border-bottom: 2px solid $bg-secondary-color;
+    border-radius: 0 0 .5rem .5rem;
+
+    h1 {
+        font-size: 1.5rem;
+    }
+}
+
+.main {
+    padding: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #2e2e2e;
+        color: white;
+    }
+}
+
+@media screen and (min-width: $breakpoint-lg) {
+    .main {
+        padding: 1.5rem;
+    }
+}

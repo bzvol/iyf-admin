@@ -1,0 +1,44 @@
+@import '../../../variables';
+
+.menu__profile {
+  color: #fff;
+  padding: 1.5rem 1rem;
+  border-bottom: 2px solid $bg-secondary-color;
+}
+
+.menu__profile-data {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: .5rem;
+}
+
+.menu__profile-photo {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+}
+
+.menu__profile-name {
+  font-size: 1.3rem;
+  margin-bottom: .5rem;
+}
+
+ul.menu__profile-roles {
+  display: flex;
+  gap: .35rem;
+
+  li {
+    display: inline-block;
+    padding: .3rem .5rem;
+    border-radius: 5px;
+    background-color: $bg-secondary-color;
+    color: #b0b0b0;
+    font-size: .9rem;
+  }
+}
+
+.menu__btn-sign-in-out, .menu__btn-request {
+  width: 100%;
+  margin-top: .5rem;
+}
