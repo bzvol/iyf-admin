@@ -6,7 +6,7 @@ import apiUrls from "./api";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBh6uKx5gRKrjnLPxZthaiF38_U92yNU7w",
-    authDomain: "iyfhu-caaf9.firebaseapp.com",
+    authDomain: "admin.iyf.hu",
     projectId: "iyfhu-caaf9",
     storageBucket: "iyfhu-caaf9.appspot.com",
     messagingSenderId: "452082197799",
@@ -60,13 +60,17 @@ export function useAuth(): IAuth {
             let token = await user.getIdTokenResult();
             let claims = token.claims;
 
-            if (user.metadata.creationTime === user.metadata.lastSignInTime && 'admin' !in claims) try {
+            const isNewUser = user.metadata.creationTime === undefined || user.metadata.lastSignInTime === undefined
+                ? false
+                : Date.parse(user.metadata.creationTime) === Date.parse(user.metadata.lastSignInTime);
+
+            if (isNewUser && !('admin' in claims)) try {
                 await axios.post(apiUrls.users.setDefaultClaims(user.uid));
 
                 token = await user.getIdTokenResult(true);
                 claims = token.claims;
             } catch (err) {
-                console.error("Error while setting default claims: ", err);
+                console.error(`Error while setting default claims:`, err);
             }
 
             setAuthState((prev) => ({
