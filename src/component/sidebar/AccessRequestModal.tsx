@@ -23,7 +23,7 @@ export function AccessRequestModal({modalOpen, setModalOpen, user}: {
     const defaultModalOptions: AccessRequestModalOptions = {
         btnText: "Send request",
         btnDisabled: false,
-        btnBackgroundColor: "var(--btn-primary)",
+        btnBackgroundColor: "",
         resultText: "",
         resultTextHidden: true,
         errorMessage: "",
