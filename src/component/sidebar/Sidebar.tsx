@@ -2,7 +2,6 @@ import React, {useState} from "react";
 import {useAuth} from "../../firebase";
 import "./styles/Sidebar.scss";
 import {Close, Menu} from "@mui/icons-material";
-import {useMediaQuery} from "@mui/material";
 import {Profile} from "./Profile";
 
 const lastUpdated = "2024-02-26";
