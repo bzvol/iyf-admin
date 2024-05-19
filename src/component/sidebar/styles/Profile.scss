@@ -3,7 +3,7 @@
 .menu__profile {
   color: #fff;
   padding: 1.5rem 1rem;
-  border-bottom: 2px solid $bg-secondary-color;
+  border-bottom: 2px solid $color-divider-1;
 }
 
 .menu__profile-data {
@@ -11,17 +11,34 @@
   align-items: center;
   gap: 1rem;
   margin-bottom: .5rem;
+
+  & > div {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
 }
 
 .menu__profile-photo {
-  width: 4rem;
-  height: 4rem;
+  width: 5rem;
+  height: 5rem;
   border-radius: 50%;
 }
 
 .menu__profile-name {
   font-size: 1.3rem;
-  margin-bottom: .5rem;
+}
+
+.menu__profile-email {
+  font-size: .9rem;
+  opacity: 0.7;
+  margin-bottom: 0.5rem;
+}
+
+.menu__profile-name, .menu__profile-email {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 ul.menu__profile-roles {
@@ -32,7 +49,7 @@ ul.menu__profile-roles {
     display: inline-block;
     padding: .3rem .5rem;
     border-radius: 5px;
-    background-color: $bg-secondary-color;
+    background-color: $color-secondary;
     color: #b0b0b0;
     font-size: .9rem;
   }

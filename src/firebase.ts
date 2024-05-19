@@ -4,9 +4,12 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import apiUrls from "./api";
 
+const authDomain = !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ?
+    "iyfhu-caaf9.firebaseapp.com" : "admin.iyf.hu";
+
 const firebaseConfig = {
     apiKey: "AIzaSyBh6uKx5gRKrjnLPxZthaiF38_U92yNU7w",
-    authDomain: "admin.iyf.hu",
+    authDomain: authDomain,
     projectId: "iyfhu-caaf9",
     storageBucket: "iyfhu-caaf9.appspot.com",
     messagingSenderId: "452082197799",
@@ -76,12 +79,12 @@ export function useAuth(): IAuth {
             setAuthState((prev) => ({
                 ...prev,
                 loading: false,
-                accessRequested: claims.accessRequested,
-                admin: claims.admin || claims.contentManager || claims.guestManager || claims.accessManager,
+                accessRequested: claims.accessRequested as boolean,
+                admin: (claims.admin || claims.contentManager || claims.guestManager || claims.accessManager) as boolean,
                 roles: {
-                    contentManager: claims.contentManager,
-                    guestManager: claims.guestManager,
-                    accessManager: claims.accessManager
+                    contentManager: claims.contentManager as boolean,
+                    guestManager: claims.guestManager as boolean,
+                    accessManager: claims.accessManager as boolean
                 }
             }));
         }), []);

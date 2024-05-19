@@ -3,12 +3,13 @@ import {useAuth} from "../../firebase";
 import "./styles/Sidebar.scss";
 import {Close, Menu} from "@mui/icons-material";
 import {Profile} from "./Profile";
+import NavMenu from "./NavMenu";
 
-const lastUpdated = "2024-02-26";
+const lastUpdated = "2024-05-10";
 
 export default function Sidebar() {
     const [menuOpen, setMenuOpen] = useState(false);
-    const {loggedIn} = useAuth();
+    const {loggedIn, admin} = useAuth();
 
     return (
         <>
@@ -26,10 +27,7 @@ export default function Sidebar() {
 
                 <Profile/>
 
-                <nav className="menu__nav">
-                    <ul>
-                    </ul>
-                </nav>
+                {admin && <NavMenu/>}
             </aside>
 
             <button className={`menu__btn-open ${menuOpen && "menu__btn-hidden"}`} onClick={() => setMenuOpen(true)}>

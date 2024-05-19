@@ -1,0 +1,47 @@
+@import '../../../variables';
+
+.menu__nav {
+  color: white;
+  padding: 1rem 1.5rem;
+
+  & > ul {
+    display: flex;
+    flex-direction: column;
+
+    & > li {
+      font-size: 1.1rem;
+      padding: .75rem 0;
+
+      &:hover > ul {
+        max-height: 100vh;
+      }
+
+      & > ul {
+        display: flex;
+        flex-direction: column;
+        padding-left: 1rem;
+
+        max-height: 0;
+        overflow-y: hidden;
+        transition: max-height 1s ease-in-out;
+
+        & > li {
+          font-size: 1rem;
+          padding: .5rem 0;
+
+          &:not(:last-child) {
+            border-bottom: 1px solid $color-divider-2;
+          }
+        }
+      }
+
+      &:not(:last-child) {
+        border-bottom: 1px solid $color-divider-2;
+      }
+    }
+  }
+
+  & a.active {
+    font-weight: bold;
+  }
+}

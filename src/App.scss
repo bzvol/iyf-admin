@@ -4,8 +4,13 @@ body {
     background-color: #f3f3f3;
 }
 
+#root, .body {
+    height: 100%;
+}
+
 .body {
     display: flex;
+    position: relative;
 }
 
 .main-wrapper {
@@ -13,10 +18,10 @@ body {
 }
 
 .small-screen-header {
-    background: $bg-primary-color;
+    background: $color-primary;
     color: white;
     padding: .75rem .5rem;
-    border-bottom: 2px solid $bg-secondary-color;
+    border-bottom: 2px solid $color-secondary;
     border-radius: 0 0 .5rem .5rem;
 
     h1 {
@@ -32,6 +37,10 @@ body {
     body {
         background-color: #2e2e2e;
         color: white;
+    }
+
+    svg {
+        fill: white;
     }
 }
 

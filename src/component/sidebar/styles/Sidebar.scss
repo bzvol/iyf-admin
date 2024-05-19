@@ -3,9 +3,9 @@
 $menu-rounding: 1rem;
 .menu {
     width: 90vw;
-    height: 100vh;
+    height: 100%;
     background-color: #282828;
-    border-right: 2px solid $bg-secondary-color;
+    border-right: 2px solid $color-secondary;
     border-radius: 0 $menu-rounding $menu-rounding 0;
     position: absolute;
     top: 0;
@@ -21,7 +21,7 @@ $menu-rounding: 1rem;
 
 .menu__header {
     padding: 1rem;
-    background-color: $bg-primary-color;
+    background-color: $color-primary;
     color: #fff;
     position: relative;
     border-radius: 0 $menu-rounding 0 0;

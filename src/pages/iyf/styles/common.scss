@@ -1,0 +1,173 @@
+@import "../../../variables.scss";
+@import "../../../mixins.scss";
+
+.schgrid__wrapper > h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.schgrid__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.schgrid__filter-info {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.schgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 1rem;
+}
+
+.schgrid__item {
+  background: $color-secondary-light;
+  padding: 1.5rem;
+  border-radius: .5rem;
+
+  h2, p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__top-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: .5rem;
+  }
+
+  &__top-bar-el1 {
+    display: flex;
+    gap: .5rem;
+
+    & > div {
+      background: $color-primary-light;
+      padding: .35rem;
+      border-radius: .35rem;
+
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-weight: bold;
+    }
+  }
+
+  &__options {
+    background: #c3c3c3;
+    padding: .35rem;
+    border-radius: .35rem;
+
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    &:hover > &-menu {
+      display: flex;
+    }
+
+    &-menu {
+      display: none;
+
+      position: absolute;
+      top: 100%;
+      right: 0;
+
+      padding: 1rem;
+      background: $color-secondary-light;
+      border: 1px solid $color-secondary;
+      border-radius: .5rem;
+
+      flex-direction: column;
+      gap: .5rem;
+
+      & > li {
+        @include icon-n-text;
+        position: relative;
+        cursor: pointer;
+
+        // hover effect
+        & > div {
+          position: absolute;
+          left: 50%;
+          right: 0;
+
+          background: $color-secondary;
+
+          width: 0;
+          height: 2px;
+
+          transition: width .5s, left .5s;
+
+          &:first-child {
+            top: -.3rem;
+          }
+          &:last-child {
+            bottom: -.3rem;
+          }
+        }
+
+        &:hover > div {
+          left: 0;
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  &__status {
+    color: $color-secondary;
+  }
+
+  &__metadata {
+    & > span {
+      white-space: nowrap;
+      overflow: hidden;
+      margin-left: -.5rem;
+      max-width: 0;
+      transition: max-width .3s, margin-left .3s;
+    }
+
+    &:hover > span {
+      margin-left: 0;
+      max-width: 200px;
+    }
+
+    & > img {
+      width: 1em;
+      height: 1em;
+      border-radius: 50%;
+    }
+  }
+}
+
+.Home__post-counts ul li span,
+.Home__regular-event-counts ul li span,
+.Home__event-counts ul:first-child li span {
+  font-weight: bold;
+}
+
+@media (prefers-color-scheme: dark) {
+  .schgrid__item {
+    background: $color-secondary;
+
+    &__top-bar-el1 > div {
+      background: $color-primary;
+      color: white;
+    }
+
+    &__options {
+      background: #6b6b6b;
+
+      &-menu {
+        background: $color-secondary;
+        border: 2px solid $color-primary;
+      }
+    }
+  }
+}

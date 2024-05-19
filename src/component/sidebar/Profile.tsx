@@ -5,6 +5,7 @@ import {signInWithPopup} from "firebase/auth";
 import "./styles/Profile.scss";
 
 const unknownProfilePic = "/assets/images/unknown-profile.png";
+
 export function Profile() {
     const {user, loading, loggedIn, accessRequested, admin, roles} = useAuth();
 
@@ -13,11 +14,12 @@ export function Profile() {
     return (
         <div className="menu__profile">
             {loggedIn && <div className="menu__profile-data">
-                <img src={user?.photoURL ?? unknownProfilePic} alt="Profile"
+                <img src={user?.photoURL ?? unknownProfilePic} alt="Profile" referrerPolicy={"no-referrer"}
                      onError={(e) => (e.target as HTMLImageElement).src = unknownProfilePic}
                      className="menu__profile-photo"/>
                 <div>
                     <h2 className="menu__profile-name">{user?.displayName}</h2>
+                    <h4 className="menu__profile-email">{user?.email}</h4>
                     <Roles roles={roles}/>
                 </div>
             </div>}
@@ -47,7 +49,7 @@ function Roles({roles}: { roles: IRoles }) {
     return (
         <ul className="menu__profile-roles">
             {roles.contentManager && <li title="Content Manager">CM</li>}
-            {roles.guestManager && <li title="Guest Manager">GM</li>}
+            {roles.guestManager && <li title="Event Guest Manager">GM</li>}
             {roles.accessManager && <li title="Access Manager">AM</li>}
         </ul>
     );
