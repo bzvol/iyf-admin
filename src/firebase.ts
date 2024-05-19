@@ -91,3 +91,9 @@ export function useAuth(): IAuth {
 
     return authState;
 }
+
+export function fixUserModel(user: any | null): User | null {
+    if (!user) return null;
+    user.photoURL = user.photoUrl;
+    return user;
+}

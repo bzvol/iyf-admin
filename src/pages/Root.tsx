@@ -1,4 +1,4 @@
-import Sidebar from "../component/sidebar/Sidebar";
+import Sidebar from "../components/sidebar/Sidebar";
 import {Outlet, useLocation} from "react-router-dom";
 import {useMediaQuery} from "@mui/material";
 import {useAuth} from "../firebase";

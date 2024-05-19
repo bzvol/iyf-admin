@@ -4,7 +4,7 @@ import {AccessRequestModal} from "./AccessRequestModal";
 import {signInWithPopup} from "firebase/auth";
 import "./styles/Profile.scss";
 
-const unknownProfilePic = "/assets/images/unknown-profile.png";
+const defaultProfilePhoto = "/assets/images/default-profile.png";
 
 export function Profile() {
     const {user, loading, loggedIn, accessRequested, admin, roles} = useAuth();
@@ -14,8 +14,8 @@ export function Profile() {
     return (
         <div className="menu__profile">
             {loggedIn && <div className="menu__profile-data">
-                <img src={user?.photoURL ?? unknownProfilePic} alt="Profile" referrerPolicy={"no-referrer"}
-                     onError={(e) => (e.target as HTMLImageElement).src = unknownProfilePic}
+                <img src={user?.photoURL ?? defaultProfilePhoto} alt="Profile" referrerPolicy={"no-referrer"}
+                     onError={(e) => (e.target as HTMLImageElement).src = defaultProfilePhoto}
                      className="menu__profile-photo"/>
                 <div>
                     <h2 className="menu__profile-name">{user?.displayName}</h2>

@@ -1,7 +1,7 @@
 import {Status} from "../../api";
 import {Archive, Edit, Public, Publish} from "@mui/icons-material";
 
-export const unknownProfilePic = "/assets/images/unknown-profile.png";
+export const defaultProfilePhoto = "/assets/images/default-profile.png";
 
 export function StatusIcon({status}: { status: Status }) {
     switch (status) {

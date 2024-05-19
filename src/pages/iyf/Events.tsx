@@ -4,11 +4,11 @@ import axios, {AxiosResponse} from "axios";
 import apiUrls, {makeBearer, Event, Status} from "../../api";
 import {useEffect, useState} from "react";
 import {useLoaderData} from "react-router-dom";
-import {useAuth} from "../../firebase";
+import {fixUserModel, useAuth} from "../../firebase";
 import {Add, Delete, Edit, MoreVert} from "@mui/icons-material";
-import {capitalize, getFirstName, StatusAction, StatusIcon, unknownProfilePic} from './common';
-import SearchBar from '../../component/SearchBar';
-import Alert from "../../component/Alert";
+import {capitalize, getFirstName, StatusAction, StatusIcon, defaultProfilePhoto} from './common';
+import SearchBar from '../../components/SearchBar';
+import Alert from "../../components/Alert";
 
 export default function Events() {
     const {data: events} = useLoaderData() as AxiosResponse<Event[]>;
@@ -24,7 +24,7 @@ export default function Events() {
         makeBearer(user)
             .then(config => axios.get(apiUrls.users.list, config))
             .then(res => {
-                const users = res.data as any[];
+                const users = (res.data as any[]).map(u => fixUserModel(u)!)
                 setCreatedBy(events.map(event =>
                     users.find(user => user.uid === event.metadata.createdBy)));
                 setUpdatedBy(events.map(event =>
@@ -107,12 +107,12 @@ function EventItem({createdBy, updatedBy, showOptions, ...props}: EventItemProps
                     </div>
 
                     <div className="schgrid__item__metadata">
-                        <img src={createdBy?.photoUrl || unknownProfilePic} alt="created by"
+                        <img src={createdBy?.photoUrl || defaultProfilePhoto} alt="created by"
                              referrerPolicy="no-referrer"/>
                         <span>{getFirstName(createdBy?.displayName)}</span>
                         {(event.metadata.createdBy !== event.metadata.updatedBy) && (
                             <>
-                                <img src={updatedBy?.photoUrl || unknownProfilePic} alt="updated by"
+                                <img src={updatedBy?.photoUrl || defaultProfilePhoto} alt="updated by"
                                      referrerPolicy="no-referrer"/>
                                 <span>{getFirstName(updatedBy?.displayName)}</span>
                             </>

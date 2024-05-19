@@ -7,6 +7,7 @@ import Root from "./pages/Root";
 import Posts from "./pages/iyf/Posts";
 import {useEffect} from "react";
 import Events from "./pages/iyf/Events";
+import IAM from "./pages/IAM";
 
 export default function App() {
     useEffect(() => {
@@ -27,7 +28,7 @@ export default function App() {
             children: [
                 {
                     path: "/iam",
-                    element: <h1>Users / IAM</h1>,
+                    element: <IAM/>,
                     loader: async () => await axios.get(apiUrls.users.list, await makeBearer(user!))
                 },
                 {

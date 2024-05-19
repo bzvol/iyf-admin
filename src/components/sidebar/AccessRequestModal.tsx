@@ -64,7 +64,7 @@ function handleSubmit(setModalOptions: React.Dispatch<React.SetStateAction<Acces
     setModalOptions(prev => ({...prev, btnText: "Sending...", btnDisabled: true}));
 
     axios.post(apiUrls.users.requestAccess(user!.uid))
-        .then(res => {
+        .then(() => {
             setModalOptions(prev => ({
                 ...prev,
                 btnText: "Sent!",
