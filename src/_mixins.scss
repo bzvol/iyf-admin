@@ -1,0 +1,8 @@
+@mixin icon-n-text {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  & > svg {
+    font-size: 1.2em;
+  }
+}
