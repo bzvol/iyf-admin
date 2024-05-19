@@ -1,0 +1,111 @@
+@import '../../mixins';
+
+.Alert {
+  @include icon-n-text;
+  display: inline-flex;
+  font-size: 1.2rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+
+  & > svg {
+    width: 1.2em;
+    height: 1.2em;
+    font-size: 1.2em;
+  }
+
+  span.Alert__icon.MuiCircularProgress-root {
+    color: #9e9e9e;
+    margin-right: .25rem;
+  }
+
+  &-success {
+    background-color: #d4edda;
+    color: #2e8540;
+
+    & > svg {
+      fill: #2e8540;
+    }
+  }
+
+  &-warning {
+    background-color: #fae994;
+    color: #c18b13;
+
+    & > svg {
+      fill: #c18b13;
+    }
+  }
+
+  &-error {
+    background-color: #f8d7da;
+    color: #721c24;
+
+    & > svg {
+      fill: #721c24;
+    }
+  }
+
+  &-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+
+    & > svg {
+      fill: #0c5460;
+    }
+  }
+
+  &-loading {
+    background-color: #d8d8d8;
+    color: #000;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .Alert {
+    &-success {
+      background-color: #155724;
+      color: #d4edda;
+
+      & > svg {
+        fill: #d4edda;
+      }
+    }
+
+    &-warning {
+      background-color: #856404;
+      color: #fae994;
+
+      & > svg {
+        fill: #fae994;
+      }
+    }
+
+    &-error {
+      background-color: #721c24;
+      color: #f8d7da;
+
+      & > svg {
+        fill: #f8d7da;
+      }
+    }
+
+    &-info {
+      background-color: #0c5460;
+      color: #d1ecf1;
+
+      & > svg {
+        fill: #d1ecf1;
+      }
+    }
+
+    &-loading {
+      background-color: #a4a4a4;
+      color: #fff;
+    }
+
+    span.Alert__icon.MuiCircularProgress-root {
+      color: #dfdfdf;
+      margin-right: .25rem;
+    }
+  }
+}
