@@ -1,8 +1,7 @@
 import React, {useState} from "react";
 import {User} from "firebase/auth";
 import Modal from "../Modal";
-import axios from "axios";
-import apiUrls from "../../api";
+import apiUrls, {httpClient} from "../../api";
 import "./styles/AccessRequestModal.scss";
 
 interface AccessRequestModalOptions {
@@ -63,7 +62,7 @@ export function AccessRequestModal({modalOpen, setModalOpen, user}: {
 function handleSubmit(setModalOptions: React.Dispatch<React.SetStateAction<AccessRequestModalOptions>>, user: User | null) {
     setModalOptions(prev => ({...prev, btnText: "Sending...", btnDisabled: true}));
 
-    axios.post(apiUrls.users.requestAccess(user!.uid))
+    httpClient.post(apiUrls.users.requestAccess(user!.uid))
         .then(() => {
             setModalOptions(prev => ({
                 ...prev,

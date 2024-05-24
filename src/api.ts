@@ -1,56 +1,61 @@
 import {User} from "firebase/auth";
-import {AxiosRequestConfig} from "axios";
+import axios from "axios";
+import {auth} from "./firebase";
 
 const base = !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000/api' : 'https://api.iyf.hu/api';
 
+export const httpClient = axios.create({baseURL: base});
+httpClient.interceptors.request.use(async config => {
+    if (!auth.currentUser) return config;
+    const token = await auth.currentUser.getIdToken();
+    config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});
+
 const apiUrls = {
     users: {
-        list: `${base}/users`,
-        read: (id: string) => `${base}/users/${id}`, // public
-        setDefaultClaims: (id: string) => `${base}/users/${id}/set-default-claims`, // public
-        clearClaims: (id: string) => `${base}/users/${id}/clear-claims`,
-        requestAccess: (id: string) => `${base}/users/${id}/request-access`, // public
-        grantAccess: (id: string) => `${base}/users/${id}/grant-access`,
-        revokeAccess: (id: string) => `${base}/users/${id}/revoke-access`,
-        updateRoles: (id: string) => `${base}/users/${id}/update-roles`,
+        list: `/users`,
+        read: (id: string) => `/users/${id}`, // public
+        setDefaultClaims: (id: string) => `/users/${id}/set-default-claims`, // public
+        clearClaims: (id: string) => `/users/${id}/clear-claims`,
+        requestAccess: (id: string) => `/users/${id}/request-access`, // public
+        grantAccess: (id: string) => `/users/${id}/grant-access`,
+        revokeAccess: (id: string) => `/users/${id}/revoke-access`,
+        updateRoles: (id: string) => `/users/${id}/update-roles`,
     },
     info: {
-        counts: `${base}/info/counts`, // public
+        counts: `/info/counts`, // public
     },
     posts: {
-        list: `${base}/posts`, // public
-        create: `${base}/posts`,
-        read: (id: number) => `${base}/posts/${id}`, // public
-        update: (id: number) => `${base}/posts/${id}`,
-        delete: (id: number) => `${base}/posts/${id}`,
+        list: `/posts`, // public
+        create: `/posts`,
+        read: (id: number) => `/posts/${id}`, // public
+        update: (id: number) => `/posts/${id}`,
+        delete: (id: number) => `/posts/${id}`,
     },
     events: {
-        list: `${base}/events`, // public
-        create: `${base}/events`,
-        read: (id: number) => `${base}/events/${id}`, // public
-        update: (id: number) => `${base}/events/${id}`,
-        delete: (id: number) => `${base}/events/${id}`,
+        list: `/events`, // public
+        create: `/events`,
+        read: (id: number) => `/events/${id}`, // public
+        update: (id: number) => `/events/${id}`,
+        delete: (id: number) => `/events/${id}`,
         guests: {
-            list: (eventId: number) => `${base}/events/${eventId}/guests`, // public
-            create: (eventId: number) => `${base}/events/${eventId}/guests`,
-            read: (eventId: number, guestId: number) => `${base}/events/${eventId}/guests/${guestId}`, // public
-            update: (eventId: number, guestId: number) => `${base}/events/${eventId}/guests/${guestId}`,
-            delete: (eventId: number, guestId: number) => `${base}/events/${eventId}/guests/${guestId}`,
+            list: (eventId: number) => `/events/${eventId}/guests`, // public
+            create: (eventId: number) => `/events/${eventId}/guests`,
+            read: (eventId: number, guestId: number) => `/events/${eventId}/guests/${guestId}`, // public
+            update: (eventId: number, guestId: number) => `/events/${eventId}/guests/${guestId}`,
+            delete: (eventId: number, guestId: number) => `/events/${eventId}/guests/${guestId}`,
         }
     },
     regularEvents: {
-        list: `${base}/regular`, // public
-        create: `${base}/regular`,
-        read: (id: number) => `${base}/regular/${id}`, // public
-        update: (id: number) => `${base}/regular/${id}`,
-        delete: (id: number) => `${base}/regular/${id}`,
+        list: `/regular`, // public
+        create: `/regular`,
+        read: (id: number) => `/regular/${id}`, // public
+        update: (id: number) => `/regular/${id}`,
+        delete: (id: number) => `/regular/${id}`,
     }
 };
-
-export async function makeBearer(user: User): Promise<AxiosRequestConfig> {
-    return {headers: {Authorization: `Bearer ${await user.getIdToken()}`}};
-}
 
 export default apiUrls;
 
@@ -80,12 +85,13 @@ export interface CountInfo {
 }
 
 export type Status = 'draft' | 'published' | 'archived';
+
 interface MetadataAttributes {
     metadata: {
         createdAt: string;
-        createdBy: string;
+        createdBy: User;
         updatedAt: string;
-        updatedBy: string;
+        updatedBy: User;
     }
 }
 
@@ -95,6 +101,7 @@ export interface Post extends MetadataAttributes {
     content: string;
     tags: string[];
     status: Status;
+    publishedAt: string | null;
 }
 
 export interface Event extends MetadataAttributes {
@@ -107,6 +114,7 @@ export interface Event extends MetadataAttributes {
         location: string;
     },
     status: Status;
+    publishedAt: string | null;
 }
 
 export interface RegularEvent extends MetadataAttributes {

@@ -1,37 +1,37 @@
 import './styles/Posts.scss';
 import './styles/common.scss';
-import axios, {AxiosResponse} from "axios";
-import apiUrls, {makeBearer, Post, Status} from "../../api";
+import apiUrls, {httpClient, Post, Status} from "../../api";
 import {useEffect, useState} from "react";
-import {useLoaderData} from "react-router-dom";
-import {fixUserModel, useAuth} from "../../firebase";
+import {useAuth} from "../../firebase";
 import {Add, Delete, Edit, MoreVert} from "@mui/icons-material";
-import {capitalize, getFirstName, StatusAction, StatusIcon, defaultProfilePhoto} from './common';
+import {capitalize, getFirstName, getMetadataTitle, StatusAction, StatusIcon} from './common';
 import SearchBar from '../../components/SearchBar';
-import Alert from "../../components/Alert";
+import UserPhoto from "../../components/UserPhoto";
+import ViewOnlyAlert from "../../components/ViewOnlyAlert";
 
 export default function Posts() {
-    const {data: posts} = useLoaderData() as AxiosResponse<Post[]>;
-    const [filteredPosts, setFilteredPosts] = useState<Post[]>(posts);
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [loaded, setLoaded] = useState(false);
+    const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
 
-    const {user, roles} = useAuth();
+    const {roles} = useAuth();
 
-    const [createdBy, setCreatedBy] = useState<(any)[]>([]);
-    const [updatedBy, setUpdatedBy] = useState<(any)[]>([]);
+    const loadPosts = async () => {
+        try {
+            setLoaded(false);
+            const postsRes = await httpClient.get<Post[]>(apiUrls.posts.list);
+            setPosts(postsRes.data);
+            setFilteredPosts(postsRes.data);
+            setLoaded(true);
+        } catch (e) {
+            // TODO: Send error noti/alert
+            console.error("Error fetching posts", e);
+        }
+    };
 
     useEffect(() => {
-        if (!user) return;
-        // TODO: this only works if user is AM, needs to be updated to work with any admin
-        makeBearer(user)
-            .then(config => axios.get(apiUrls.users.list, config))
-            .then(res => {
-                const users = (res.data as any[]).map(u => fixUserModel(u)!)
-                setCreatedBy(posts.map(post =>
-                    users.find(user => user.uid === post.metadata.createdBy)));
-                setUpdatedBy(posts.map(post =>
-                    users.find(user => user.uid === post.metadata.updatedBy)));
-            });
-    }, [posts, user]);
+        loadPosts();
+    }, []);
 
     // If there are more than 50 posts, the filter will
     // only be applied 500ms after the user stops typing.
@@ -62,41 +62,37 @@ export default function Posts() {
             <div className="schgrid__actions">
                 {roles.contentManager
                     ? <button className="icon-n-text" onClick={handleCreate}><Add/> Create</button>
-                    : <Alert type="info">You don't have permission to create or edit posts.</Alert>}
+                    : <ViewOnlyAlert/>}
                 <SearchBar onSearch={handleSearch}/>
             </div>
             <div className="schgrid__filter-info">
-                {filteredPosts.length !== 0
-                    ? `Showing ${filteredPosts.length} of ${posts.length} posts`
-                    : posts.length === 0 ? "There are not yet any posts." : "No posts found."}
+                {loaded
+                    ? (filteredPosts.length !== 0
+                        ? `Showing ${filteredPosts.length} of ${posts.length} posts`
+                        : posts.length === 0 ? "There are not yet any posts." : "No posts found.")
+                    : "Loading posts..."}
             </div>
             <div className="schgrid">
-                {filteredPosts.reverse().map((post, idx) => (
-                    <PostItem key={"post" + post.id} post={post}
-                              createdBy={createdBy[idx]} updatedBy={updatedBy[idx]}
-                              showOptions={roles.contentManager}/>
+                {filteredPosts.map((post) => (
+                    <PostItem key={"post" + post.id} post={post} showOptions={roles.contentManager}/>
                 ))}
             </div>
         </section>
     );
 }
 
-interface PostItemProps {
-    post: Post;
-    createdBy: any;
-    updatedBy: any;
-    showOptions: boolean;
-}
-
-function PostItem({createdBy, updatedBy, showOptions, ...props}: PostItemProps) {
+function PostItem({showOptions, ...props}: { post: Post; showOptions: boolean; }) {
     const [post, setPost] = useState<Post>(props.post);
 
-    const {user} = useAuth();
-
     async function handleStatusAction(status: Status) {
-        post.status = status === "draft" || status === "archived" ? "published" : "archived";
-        const res = await axios.put(apiUrls.posts.update(post.id), post, await makeBearer(user!))
-        if (res.status === 200) setPost(res.data as Post);
+        try {
+            post.status = status === "draft" || status === "archived" ? "published" : "archived";
+            const res = await httpClient.put<Post>(apiUrls.posts.update(post.id), post)
+            setPost(res.data);
+        } catch (e) {
+            // TODO: Send error noti/alert
+            console.error("Error updating post", e);
+        }
     }
 
     return (
@@ -107,15 +103,17 @@ function PostItem({createdBy, updatedBy, showOptions, ...props}: PostItemProps) 
                         <StatusIcon status={post.status}/>
                     </div>
 
-                    <div className="schgrid__item__metadata">
-                        <img src={createdBy?.photoUrl || defaultProfilePhoto} alt="created by"
-                             referrerPolicy="no-referrer"/>
-                        <span>{getFirstName(createdBy?.displayName)}</span>
-                        {(post.metadata.createdBy !== post.metadata.updatedBy) && (
+                    <div className="schgrid__item__metadata"
+                         title={getMetadataTitle(post.metadata.createdBy, post.metadata.updatedBy)}>
+                        <UserPhoto user={post.metadata.createdBy}
+                                   alt={`Created by ${post.metadata.createdBy.displayName}`}/>
+                        <span>{getFirstName(post.metadata.createdBy.displayName)}</span>
+
+                        {(post.metadata.createdBy.uid !== post.metadata.updatedBy.uid) && (
                             <>
-                                <img src={updatedBy?.photoUrl || defaultProfilePhoto} alt="updated by"
-                                     referrerPolicy="no-referrer"/>
-                                <span>{getFirstName(updatedBy?.displayName)}</span>
+                                <UserPhoto user={post.metadata.updatedBy}
+                                           alt={`Updated by ${post.metadata.updatedBy.displayName}`}/>
+                                <span>{getFirstName(post.metadata.updatedBy.displayName)}</span>
                             </>
                         )}
                     </div>

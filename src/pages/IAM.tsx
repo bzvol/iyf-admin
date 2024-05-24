@@ -1,21 +1,32 @@
 import './styles/IAM.scss';
-import {useLoaderData} from "react-router-dom";
-import {fixUserModel, useAuth} from "../firebase";
-import Alert from "../components/Alert";
-
-const defaultProfilePhoto = "/assets/images/default-profile.png";
+import {useAuth} from "../firebase";
+import UserPhoto from "../components/UserPhoto";
+import ViewOnlyAlert from "../components/ViewOnlyAlert";
+import {User} from "firebase/auth";
+import {useEffect, useState} from "react";
+import apiUrls, {httpClient} from "../api";
 
 export default function IAM() {
-    const {data} = useLoaderData() as { data: any[] };
-    const users = data.map(u => fixUserModel(u)!);
+    const [users, setUsers] = useState<User[]>([]);
 
     const {roles} = useAuth();
 
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await httpClient.get<User[]>(apiUrls.users.list);
+                setUsers(res.data);
+            } catch (e) {
+                // TODO: send error noti/alert
+                console.error(e);
+            }
+        })();
+    }, []);
+
     return (
-        <section className="IAM">
+        <section className="IAM flex-vert-gap1">
             <h1>Users / IAM</h1>
-            {!roles.accessManager &&
-                <Alert type="info">You cannot modify users.</Alert>}
+            {!roles.accessManager && <ViewOnlyAlert/>}
             <table>
                 <thead>
                 <tr>
@@ -27,11 +38,7 @@ export default function IAM() {
                 <tbody>
                 {users.map(user => (
                     <tr key={user.uid}>
-                        <td>
-                            <img src={user.photoURL || defaultProfilePhoto}
-                                 alt={user.displayName || "<No name>"}
-                                 referrerPolicy="no-referrer"/>
-                        </td>
+                        <td><UserPhoto user={user}/></td>
                         <td>{user.displayName}</td>
                         <td>{user.email}</td>
                     </tr>

@@ -1,8 +1,7 @@
 import {initializeApp} from "firebase/app";
 import {getAuth, GoogleAuthProvider, User} from "firebase/auth";
 import {useEffect, useState} from "react";
-import axios from "axios";
-import apiUrls from "./api";
+import apiUrls, {httpClient} from "./api";
 
 const authDomain = !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ?
     "iyfhu-caaf9.firebaseapp.com" : "admin.iyf.hu";
@@ -68,7 +67,7 @@ export function useAuth(): IAuth {
                 : Date.parse(user.metadata.creationTime) === Date.parse(user.metadata.lastSignInTime);
 
             if (isNewUser && !('admin' in claims)) try {
-                await axios.post(apiUrls.users.setDefaultClaims(user.uid));
+                await httpClient.post(apiUrls.users.setDefaultClaims(user.uid));
 
                 token = await user.getIdTokenResult(true);
                 claims = token.claims;
@@ -90,10 +89,4 @@ export function useAuth(): IAuth {
         }), []);
 
     return authState;
-}
-
-export function fixUserModel(user: any | null): User | null {
-    if (!user) return null;
-    user.photoURL = user.photoUrl;
-    return user;
 }

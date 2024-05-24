@@ -15,7 +15,7 @@ export default function Alert({type = "warning", children}: { type?: AlertType, 
 
         if (type !== "loading") icon.style.fontSize = `min(${alert.clientHeight}px, 2.5rem)`;
         else icon.style.width = icon.style.height = `min(${alert.clientHeight}px, 2.5rem)`;
-    }, []);
+    }, [type]);
 
     return (
         <div className={`Alert Alert-${type}`} role="alert">

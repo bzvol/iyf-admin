@@ -1,14 +1,39 @@
 import './styles/Home.scss';
-import {useLoaderData} from "react-router-dom";
-import {AxiosResponse} from "axios";
-import {CountInfo} from "../api";
+import apiUrls, {CountInfo, httpClient} from "../api";
+import {useEffect, useState} from "react";
+import {useAuth} from "../firebase";
+import Alert from "../components/Alert";
 
 export function Home() {
-    const {data: {posts, events, regularEvents}} = useLoaderData() as AxiosResponse<CountInfo>;
+    const [countInfo, setContentInfo] = useState<CountInfo>({
+        posts: {total: 0, draft: 0, published: 0, archived: 0},
+        events: {total: 0, draft: 0, published: 0, archived: 0, upcoming: 0, past: 0, totalGuests: 0, uniqueGuests: 0},
+        regularEvents: {total: 0, draft: 0, published: 0, archived: 0}
+    });
+    const [loaded, setLoaded] = useState(false);
+
+    const {user} = useAuth();
+    useEffect(() => {
+        if (!user) return;
+        (async () => {
+            try {
+                setLoaded(false);
+                const res = await httpClient.get<CountInfo>(apiUrls.info.counts);
+                setContentInfo(res.data);
+                setLoaded(true);
+            } catch (e) {
+                // TODO: Send error noti/alert
+                console.error("Error fetching counts", e);
+            }
+        })();
+    }, [user]);
+
+    const {posts, events, regularEvents} = countInfo;
 
     return (
-        <div className="Home">
+        <div className="Home flex-vert-gap1">
             <h1>IYF counters</h1>
+            {!loaded && <Alert type="loading">Loading counts...</Alert>}
             <section className="Home__widgets">
                 <article className="Home__widget Home__post-counts">
                     <h2>{posts.total} posts</h2>
