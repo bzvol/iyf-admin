@@ -27,7 +27,7 @@ export default function Sidebar() {
 
                 <Profile/>
 
-                {admin && <NavMenu/>}
+                {loggedIn && admin && <NavMenu/>}
             </aside>
 
             <button className={`menu__btn-open ${menuOpen && "menu__btn-hidden"}`} onClick={() => setMenuOpen(true)}>

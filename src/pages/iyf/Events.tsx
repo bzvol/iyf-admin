@@ -8,6 +8,7 @@ import {capitalize, getFirstName, getMetadataTitle, StatusAction, StatusIcon} fr
 import SearchBar from '../../components/SearchBar';
 import ViewOnlyAlert from "../../components/ViewOnlyAlert";
 import UserPhoto from "../../components/UserPhoto";
+import Alert from "../../components/Alert";
 
 export default function Events() {
     const [events, setEvents] = useState<Event[]>([]);
@@ -57,7 +58,7 @@ export default function Events() {
     }
 
     return (
-        <section className="Events schgrid__wrapper">
+        <section className="Events schgrid__wrapper flex-vert-gap1">
             <h1>Events</h1>
             <div className="schgrid__actions">
                 {roles.contentManager
@@ -65,12 +66,11 @@ export default function Events() {
                     : <ViewOnlyAlert/>}
                 <SearchBar onSearch={handleSearch}/>
             </div>
+            {!loaded && <Alert type="loading">Loading events...</Alert> }
             <div className="schgrid__filter-info">
-                {loaded
-                    ? (filteredEvents.length !== 0
-                        ? `Showing ${filteredEvents.length} of ${events.length} events`
-                        : events.length === 0 ? "There are not yet any events." : "No events found.")
-                    : "Loading events..."}
+                {loaded && (filteredEvents.length !== 0
+                    ? `Showing ${filteredEvents.length} of ${events.length} events`
+                    : events.length === 0 ? "There are not yet any events." : "No events found.")}
             </div>
             <div className="schgrid">
                 {filteredEvents.map((event) => (

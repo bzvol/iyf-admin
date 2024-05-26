@@ -3,7 +3,7 @@ import {useAuth} from "../firebase";
 import UserPhoto from "../components/UserPhoto";
 import ViewOnlyAlert from "../components/ViewOnlyAlert";
 import {User} from "firebase/auth";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import apiUrls, {httpClient} from "../api";
 import Alert from "../components/Alert";
 
@@ -51,11 +51,12 @@ export default function IAM() {
 function UserItem({user, isManager}: { user: UserWithClaims, isManager: boolean }) {
     const statusProps = getStatusProps(user.customClaims);
 
-    const originalRoles: UserRoles = {
+    const originalRoles = useMemo(() => ({
         contentManager: user.customClaims.contentManager,
         guestManager: user.customClaims.guestManager,
         accessManager: user.customClaims.accessManager
-    };
+    }), [user.customClaims]);
+
     const [roles, setRoles] = useState<UserRoles>(originalRoles);
     const [rolesChanged, setRolesChanged] = useState(false);
 
@@ -64,7 +65,7 @@ function UserItem({user, isManager}: { user: UserWithClaims, isManager: boolean 
         const hasChanged = Object.keys(roles).some(key =>
             roles[key as keyof UserRoles] !== originalRoles[key as keyof UserRoles])
         setRolesChanged(hasChanged);
-    }, [roles]);
+    }, [originalRoles, roles]);
 
     const updateRole = (role: keyof UserRoles, value: boolean) =>
         setRoles(prev => ({...prev, [role]: value}));

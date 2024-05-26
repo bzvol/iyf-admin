@@ -8,6 +8,7 @@ import {capitalize, getFirstName, getMetadataTitle, StatusAction, StatusIcon} fr
 import SearchBar from '../../components/SearchBar';
 import UserPhoto from "../../components/UserPhoto";
 import ViewOnlyAlert from "../../components/ViewOnlyAlert";
+import Alert from "../../components/Alert";
 
 export default function Posts() {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -57,7 +58,7 @@ export default function Posts() {
     }
 
     return (
-        <section className="Posts schgrid__wrapper">
+        <section className="Posts schgrid__wrapper flex-vert-gap1">
             <h1>Posts</h1>
             <div className="schgrid__actions">
                 {roles.contentManager
@@ -65,12 +66,11 @@ export default function Posts() {
                     : <ViewOnlyAlert/>}
                 <SearchBar onSearch={handleSearch}/>
             </div>
+            {!loaded && <Alert type="loading">Loading posts...</Alert>}
             <div className="schgrid__filter-info">
-                {loaded
-                    ? (filteredPosts.length !== 0
-                        ? `Showing ${filteredPosts.length} of ${posts.length} posts`
-                        : posts.length === 0 ? "There are not yet any posts." : "No posts found.")
-                    : "Loading posts..."}
+                {loaded && (filteredPosts.length !== 0
+                    ? `Showing ${filteredPosts.length} of ${posts.length} posts`
+                    : posts.length === 0 ? "There are not yet any posts." : "No posts found.")}
             </div>
             <div className="schgrid">
                 {filteredPosts.map((post) => (
