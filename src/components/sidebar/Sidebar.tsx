@@ -5,7 +5,7 @@ import {Close, Menu} from "@mui/icons-material";
 import {Profile} from "./Profile";
 import NavMenu from "./NavMenu";
 
-const lastUpdated = "2024-05-10";
+const lastUpdated = "2024-05-26";
 
 export default function Sidebar() {
     const [menuOpen, setMenuOpen] = useState(false);

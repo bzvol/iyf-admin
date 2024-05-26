@@ -4,7 +4,7 @@ import React from "react";
 
 const defaultProfilePhoto = "/assets/images/default-profile.png";
 
-export default function UserPhoto({user, className, alt}: { user: User | null, className?: string, alt?: string }) {
+export default function UserPhoto({user, className = "", alt}: { user: User | null, className?: string, alt?: string }) {
     return (
         <img src={user?.photoURL ?? defaultProfilePhoto} alt={alt ?? user?.displayName ?? "Profile photo"}
              referrerPolicy="no-referrer" onError={handleLoadError} className={"UserPhoto " + className}/>
