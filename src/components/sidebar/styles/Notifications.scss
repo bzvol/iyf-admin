@@ -1,0 +1,23 @@
+.Notifications {
+  color: white;
+  padding: 1rem 1.5rem;
+}
+
+.Notifications-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+
+  & > svg {
+    cursor: pointer;
+  }
+}
+
+.Notifications-items {
+  display: inline-flex;
+  flex-direction: column;
+  max-height: 280px;
+  border-radius: 0.5rem;
+  overflow-y: auto;
+  gap: .5rem;
+}

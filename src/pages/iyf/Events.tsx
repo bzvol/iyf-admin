@@ -1,6 +1,6 @@
 import './styles/Events.scss';
 import './styles/common.scss';
-import apiUrls, {Event, httpClient, Status} from "../../api";
+import apiUrls, {Event, apiClient, Status} from "../../api";
 import {useEffect, useState} from "react";
 import {useAuth} from "../../firebase";
 import {Add, Delete, Edit, MoreVert} from "@mui/icons-material";
@@ -20,7 +20,7 @@ export default function Events() {
     const loadEvents = async () => {
         try {
             setLoaded(false);
-            const eventsRes = await httpClient.get<Event[]>(apiUrls.events.list);
+            const eventsRes = await apiClient.get<Event[]>(apiUrls.events.list);
             setEvents(eventsRes.data);
             setFilteredEvents(eventsRes.data);
             setLoaded(true);
@@ -87,7 +87,7 @@ function EventItem({showOptions, ...props}: { event: Event; showOptions: boolean
     async function handleStatusAction(status: Status) {
         try {
             event.status = status === "draft" || status === "archived" ? "published" : "archived";
-            const res = await httpClient.put<Event>(apiUrls.events.update(event.id), event)
+            const res = await apiClient.put<Event>(apiUrls.events.update(event.id), event)
             setEvent(res.data);
         } catch (e) {
             // TODO: Send error noti/alert

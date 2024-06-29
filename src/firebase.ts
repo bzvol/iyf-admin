@@ -1,7 +1,7 @@
 import {initializeApp} from "firebase/app";
 import {getAuth, GoogleAuthProvider, User} from "firebase/auth";
 import {useEffect, useState} from "react";
-import apiUrls, {httpClient} from "./api";
+import apiUrls, {apiClient} from "./api";
 
 const authDomain = !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ?
     "iyfhu-caaf9.firebaseapp.com" : "admin.iyf.hu";
@@ -67,7 +67,7 @@ export function useAuth(): IAuth {
                 : Date.parse(user.metadata.creationTime) === Date.parse(user.metadata.lastSignInTime);
 
             if (isNewUser && !('admin' in claims)) try {
-                await httpClient.post(apiUrls.users.setDefaultClaims(user.uid));
+                await apiClient.post(apiUrls.users.setDefaultClaims(user.uid));
 
                 token = await user.getIdTokenResult(true);
                 claims = token.claims;

@@ -5,8 +5,8 @@ import {auth} from "./firebase";
 const base = !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000/api' : 'https://api.iyf.hu/api';
 
-export const httpClient = axios.create({baseURL: base});
-httpClient.interceptors.request.use(async config => {
+export const apiClient = axios.create({baseURL: base});
+apiClient.interceptors.request.use(async config => {
     if (!auth.currentUser) return config;
     const token = await auth.currentUser.getIdToken();
     config.headers.Authorization = `Bearer ${token}`;

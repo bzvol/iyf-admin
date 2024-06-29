@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 import {CheckCircle, Error, Info, Warning} from "@mui/icons-material";
 import {CircularProgress} from "@mui/material";
 
-type AlertType = "warning" | "error" | "info" | "success" | "loading";
+export type AlertType = "warning" | "error" | "info" | "success" | "loading";
 
 export default function Alert({type = "warning", children}: { type?: AlertType, children: React.ReactNode }) {
     const [iconSize, setIconSize] = useState(0);

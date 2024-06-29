@@ -1,5 +1,5 @@
 import './styles/Home.scss';
-import apiUrls, {CountInfo, httpClient} from "../api";
+import apiUrls, {CountInfo, apiClient} from "../api";
 import {useEffect, useState} from "react";
 import {useAuth} from "../firebase";
 import Alert from "../components/Alert";
@@ -18,7 +18,7 @@ export function Home() {
         (async () => {
             try {
                 setLoaded(false);
-                const res = await httpClient.get<CountInfo>(apiUrls.info.counts);
+                const res = await apiClient.get<CountInfo>(apiUrls.info.counts);
                 setContentInfo(res.data);
                 setLoaded(true);
             } catch (e) {

@@ -1,6 +1,6 @@
 import './styles/Posts.scss';
 import './styles/common.scss';
-import apiUrls, {httpClient, Post, Status} from "../../api";
+import apiUrls, {apiClient, Post, Status} from "../../api";
 import {useEffect, useState} from "react";
 import {useAuth} from "../../firebase";
 import {Add, Delete, Edit, MoreVert} from "@mui/icons-material";
@@ -20,7 +20,7 @@ export default function Posts() {
     const loadPosts = async () => {
         try {
             setLoaded(false);
-            const postsRes = await httpClient.get<Post[]>(apiUrls.posts.list);
+            const postsRes = await apiClient.get<Post[]>(apiUrls.posts.list);
             setPosts(postsRes.data);
             setFilteredPosts(postsRes.data);
             setLoaded(true);
@@ -87,7 +87,7 @@ function PostItem({showOptions, ...props}: { post: Post; showOptions: boolean; }
     async function handleStatusAction(status: Status) {
         try {
             post.status = status === "draft" || status === "archived" ? "published" : "archived";
-            const res = await httpClient.put<Post>(apiUrls.posts.update(post.id), post)
+            const res = await apiClient.put<Post>(apiUrls.posts.update(post.id), post)
             setPost(res.data);
         } catch (e) {
             // TODO: Send error noti/alert

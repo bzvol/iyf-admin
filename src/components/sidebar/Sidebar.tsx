@@ -4,6 +4,7 @@ import "./styles/Sidebar.scss";
 import {Close, Menu} from "@mui/icons-material";
 import {Profile} from "./Profile";
 import NavMenu from "./NavMenu";
+import Notifications from "./Notifications";
 
 const lastUpdated = "2024-05-26";
 
@@ -28,6 +29,8 @@ export default function Sidebar() {
                 <Profile/>
 
                 {loggedIn && admin && <NavMenu/>}
+
+                <Notifications/>
             </aside>
 
             <button className={`menu__btn-open ${menuOpen && "menu__btn-hidden"}`} onClick={() => setMenuOpen(true)}>

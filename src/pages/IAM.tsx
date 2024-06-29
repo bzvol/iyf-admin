@@ -3,9 +3,10 @@ import {useAuth} from "../firebase";
 import UserPhoto from "../components/UserPhoto";
 import ViewOnlyAlert from "../components/ViewOnlyAlert";
 import {User} from "firebase/auth";
-import {useEffect, useMemo, useState} from "react";
-import apiUrls, {httpClient} from "../api";
+import {useContext, useEffect, useMemo, useState} from "react";
+import apiUrls, {apiClient} from "../api";
 import Alert from "../components/Alert";
+import {NotificationsContext} from "../components/sidebar/Notifications";
 
 type UserWithClaims = User & { customClaims: UserClaims };
 type UserClaims = {
@@ -28,7 +29,7 @@ export default function IAM() {
     useEffect(() => {
         (async () => {
             try {
-                const res = await httpClient.get<UserWithClaims[]>(apiUrls.users.list);
+                const res = await apiClient.get<UserWithClaims[]>(apiUrls.users.list);
                 setUsers(res.data);
                 setLoaded(true);
             } catch (e) {
@@ -49,6 +50,8 @@ export default function IAM() {
 }
 
 function UserItem({user, isManager}: { user: UserWithClaims, isManager: boolean }) {
+    const { addNotification } = useContext(NotificationsContext);
+
     const statusProps = getStatusProps(user.customClaims);
 
     const originalRoles = useMemo(() => ({
@@ -108,7 +111,7 @@ function UserItem({user, isManager}: { user: UserWithClaims, isManager: boolean 
                         );
                     })}
                 </ul>
-                {rolesChanged && <button onClick={() => handleRolesUpdate(user, roles)}>Update roles</button>}
+                {rolesChanged && <button onClick={() => handleRolesUpdate(user, roles, addNotification)}>Update roles</button>}
             </div>
         </article>
     );
@@ -143,7 +146,15 @@ const rolesLabels: Record<keyof UserRoles, string> = {
     accessManager: "Access Manager"
 };
 
-function handleRolesUpdate(user: UserWithClaims, roles: UserRoles) {
+function handleRolesUpdate(user: UserWithClaims, roles: UserRoles, addNoti: any) {
     // TODO: implement
     console.log("handleRolesUpdate", user.uid, roles);
+    addNoti({
+        messages: {
+            loading: "Updating roles...",
+            success: "Roles updated successfully",
+            error: "Failed to update roles"
+        },
+        action: () => new Promise(resolve => setTimeout(resolve, 2000))
+    });
 }

@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {User} from "firebase/auth";
 import Modal from "../Modal";
-import apiUrls, {httpClient} from "../../api";
+import apiUrls, {apiClient} from "../../api";
 import "./styles/AccessRequestModal.scss";
 
 interface AccessRequestModalOptions {
@@ -62,7 +62,7 @@ export function AccessRequestModal({modalOpen, setModalOpen, user}: {
 function handleSubmit(setModalOptions: React.Dispatch<React.SetStateAction<AccessRequestModalOptions>>, user: User | null) {
     setModalOptions(prev => ({...prev, btnText: "Sending...", btnDisabled: true}));
 
-    httpClient.post(apiUrls.users.requestAccess(user!.uid))
+    apiClient.post(apiUrls.users.requestAccess(user!.uid))
         .then(() => {
             setModalOptions(prev => ({
                 ...prev,
