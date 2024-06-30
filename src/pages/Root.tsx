@@ -4,7 +4,7 @@ import {useMediaQuery} from "@mui/material";
 import {useAuth} from "../firebase";
 import {Home} from "./Home";
 import {useState} from "react";
-import {Notification, NotificationsContext} from "../components/sidebar/Notifications";
+import {Notification, NotificationsContext, NotificationToasts} from "../components/sidebar/Notifications";
 
 export default function Root() {
     const {loggedIn, admin} = useAuth();
@@ -13,7 +13,11 @@ export default function Root() {
     const isSmallScreen = useMediaQuery("(max-width: 992px)");
 
     const [notifications, setNotifications] = useState<Notification[]>([]);
-    const addNotification = (notification: Notification) => setNotifications(prev => [notification, ...prev])
+    const addNotification = (notification: Notification) =>
+        setNotifications(prev => [{
+            ...notification,
+            timestamp: Date.now()
+        }, ...prev])
 
     return (
         <div className="body">
@@ -22,6 +26,7 @@ export default function Root() {
                 <div className="main-wrapper">
                     {isSmallScreen && <header className="small-screen-header"><h1>IYF Admin</h1></header>}
                     <main className="main">
+                        {isSmallScreen && <NotificationToasts/>}
                         {(loggedIn && admin)
                             ? (location.pathname === "/" ? <Home/> : <Outlet/>)
                             : <UnauthorizedScreen/>}

@@ -84,6 +84,13 @@
       }
     }
   }
+
+  &__changed-roles {
+    margin-top: .5rem;
+    & > li {
+      list-style: inside;
+    }
+  }
 }
 
 @media screen and (min-width: $breakpoint-lg) {

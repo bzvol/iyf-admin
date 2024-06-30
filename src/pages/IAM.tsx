@@ -7,6 +7,7 @@ import {useContext, useEffect, useMemo, useState} from "react";
 import apiUrls, {apiClient} from "../api";
 import Alert from "../components/Alert";
 import {NotificationsContext} from "../components/sidebar/Notifications";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 type UserWithClaims = User & { customClaims: UserClaims };
 type UserClaims = {
@@ -50,7 +51,7 @@ export default function IAM() {
 }
 
 function UserItem({user, isManager}: { user: UserWithClaims, isManager: boolean }) {
-    const { addNotification } = useContext(NotificationsContext);
+    const {addNotification} = useContext(NotificationsContext);
 
     const statusProps = getStatusProps(user.customClaims);
 
@@ -61,17 +62,20 @@ function UserItem({user, isManager}: { user: UserWithClaims, isManager: boolean 
     }), [user.customClaims]);
 
     const [roles, setRoles] = useState<UserRoles>(originalRoles);
-    const [rolesChanged, setRolesChanged] = useState(false);
+    const [changedRoles, setChangedRoles] = useState<Partial<UserRoles>>({});
 
     useEffect(() => {
-        // Checks if any of the roles has changed compared to the original user roles
-        const hasChanged = Object.keys(roles).some(key =>
-            roles[key as keyof UserRoles] !== originalRoles[key as keyof UserRoles])
-        setRolesChanged(hasChanged);
+        // Sets for the difference between the original roles and the current roles (before the update)
+        setChangedRoles(Object.fromEntries(
+            Object.entries(roles).filter(([role, value]) =>
+                originalRoles[role as keyof UserRoles] !== value)));
     }, [originalRoles, roles]);
 
     const updateRole = (role: keyof UserRoles, value: boolean) =>
         setRoles(prev => ({...prev, [role]: value}));
+
+    const [statusActionConfOpen, setStatusActionConfOpen] = useState(false);
+    const [rolesUpdateConfOpen, setRolesUpdateConfOpen] = useState(false);
 
     return (
         <article className="UserItem">
@@ -111,8 +115,28 @@ function UserItem({user, isManager}: { user: UserWithClaims, isManager: boolean 
                         );
                     })}
                 </ul>
-                {rolesChanged && <button onClick={() => handleRolesUpdate(user, roles, addNotification)}>Update roles</button>}
+                {Object.keys(changedRoles).length > 0 &&
+                    <button onClick={() => setRolesUpdateConfOpen(true)}>Update roles</button>}
             </div>
+
+            <ConfirmationModal
+                isOpen={rolesUpdateConfOpen}
+                onClose={() => setRolesUpdateConfOpen(false)}
+                onConfirm={() => {
+                    setRolesUpdateConfOpen(false);
+                    handleRolesUpdate(user, roles, addNotification);
+                }}
+                title="Update roles"
+            >
+                <p>Are you sure you want to update the following roles for <b>{user.displayName}</b>?</p>
+                <ul className="UserItem__changed-roles">
+                    {Object.entries(changedRoles).map(([role, value]) =>
+                        <li key={`user-${user.uid}_role-${role}-change`}>
+                            {value ? "Grant role" : "Revoke role"} <i>{rolesLabels[role as keyof UserRoles]}</i>
+                        </li>
+                    )}
+                </ul>
+            </ConfirmationModal>
         </article>
     );
 }

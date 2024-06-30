@@ -10,6 +10,7 @@ export interface Notification {
         error: string;
     };
     action: () => Promise<void>;
+    timestamp?: number;
 }
 
 interface NotificationsContextProps {
@@ -38,14 +39,29 @@ export default function Notifications() {
                 <Delete onClick={handleClear}/>
             </div>
             <div className="Notifications-items">
-                {notifications.map((noti, index) => (
-                    <LoadingNotification key={`notification-${notifications.length - index - 1}`}
+                {notifications.map(noti => (
+                    <LoadingNotification key={`notification-${noti.timestamp}`}
                                          action={noti.action}
                                          messages={noti.messages}
                     />
                 ))}
                 {!notifications.length && <i>No notifications</i>}
             </div>
+        </div>
+    );
+}
+
+export function NotificationToasts() {
+    const {notifications} = useContext(NotificationsContext);
+
+    return (
+        <div className="NotificationToasts">
+            {notifications.slice(0, 3).map(noti => (
+                <LoadingNotificationToast key={`sb-notification-${noti.timestamp}`}
+                                          action={noti.action}
+                                          messages={noti.messages}
+                />
+            ))}
         </div>
     );
 }
@@ -63,8 +79,15 @@ function LoadingNotification(props: LoadingNotificationProps) {
     const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
 
     useEffect(() => {
-        props.action().then(() => setStatus("success")).catch(() => setStatus("error"));
-    }, [props]);
+        (async () => {
+            try {
+                await props.action();
+                setStatus("success");
+            } catch (e) {
+                setStatus("error");
+            }
+        })(); // eslint-disable-next-line
+    }, []);
 
     return (
         <Alert type={status}>
@@ -73,4 +96,33 @@ function LoadingNotification(props: LoadingNotificationProps) {
             {status === "error" && props.messages.error}
         </Alert>
     );
+}
+
+function LoadingNotificationToast(props: LoadingNotificationProps) {
+    const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+    const [show, setShow] = useState(false);
+
+    useEffect(() => {
+        setTimeout(() => setShow(true), 0);
+        (async () => {
+            try {
+                await props.action();
+                setStatus("success");
+            } catch (e) {
+                setStatus("error");
+            } finally {
+                setTimeout(() => setShow(false), 3000);
+            }
+        })(); // eslint-disable-next-line
+    }, []);
+
+    return (
+        <div className={`NotificationToast-wrapper${show ? " NotificationToast-show" : ""}`}>
+            <Alert type={status}>
+                {status === "loading" && props.messages.loading}
+                {status === "success" && props.messages.success}
+                {status === "error" && props.messages.error}
+            </Alert>
+        </div>
+    )
 }
