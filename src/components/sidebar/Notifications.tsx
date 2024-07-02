@@ -1,15 +1,17 @@
-import Alert from "../Alert";
+import Alert, {AlertType} from "../Alert";
 import React, {createContext, useContext, useEffect, useState} from "react";
 import "./styles/Notifications.scss";
 import {Delete} from "@mui/icons-material";
 
 export interface Notification {
-    messages: {
+    type: AlertType;
+    message?: string;
+    messages?: {
         loading: string;
         success: string;
         error: string;
     };
-    action: () => Promise<void>;
+    action?: () => Promise<void>;
     timestamp?: number;
 }
 
@@ -39,11 +41,15 @@ export default function Notifications() {
                 <Delete onClick={handleClear}/>
             </div>
             <div className="Notifications-items">
-                {notifications.map(noti => (
+                {notifications.map(noti => noti.type === "loading" ? (
                     <LoadingNotification key={`notification-${noti.timestamp}`}
-                                         action={noti.action}
-                                         messages={noti.messages}
+                                         action={noti.action!}
+                                         messages={noti.messages!}
                     />
+                ) : (
+                    <Alert key={`notification-${noti.timestamp}`} type={noti.type}>
+                        {noti.message!}
+                    </Alert>
                 ))}
                 {!notifications.length && <i>No notifications</i>}
             </div>
@@ -56,11 +62,15 @@ export function NotificationToasts() {
 
     return (
         <div className="NotificationToasts">
-            {notifications.slice(0, 3).map(noti => (
+            {notifications.slice(0, 3).map(noti => noti.type === "loading" ? (
                 <LoadingNotificationToast key={`sb-notification-${noti.timestamp}`}
-                                          action={noti.action}
-                                          messages={noti.messages}
+                                          action={noti.action!}
+                                          messages={noti.messages!}
                 />
+            ) : (
+                <Alert key={`sb-notification-${noti.timestamp}`} type={noti.type}>
+                    {noti.message!}
+                </Alert>
             ))}
         </div>
     );

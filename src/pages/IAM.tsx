@@ -3,7 +3,7 @@ import {useAuth} from "../firebase";
 import UserPhoto from "../components/UserPhoto";
 import ViewOnlyAlert from "../components/ViewOnlyAlert";
 import {User} from "firebase/auth";
-import {useContext, useEffect, useMemo, useState} from "react";
+import React, {useContext, useEffect, useMemo, useState} from "react";
 import apiUrls, {apiClient} from "../api";
 import Alert from "../components/Alert";
 import {NotificationsContext} from "../components/sidebar/Notifications";
@@ -24,8 +24,16 @@ type UserRoles = {
 export default function IAM() {
     const [users, setUsers] = useState<UserWithClaims[]>([]);
     const [loaded, setLoaded] = useState(false);
+    const [reloadTrigger, setTrigger] = useState(false);
+
+    const triggerReload = (action: () => Promise<void>) => async () => {
+        await action();
+        setTrigger(prev => !prev);
+    }
 
     const {roles} = useAuth();
+
+    const {addNotification} = useContext(NotificationsContext);
 
     useEffect(() => {
         (async () => {
@@ -34,24 +42,37 @@ export default function IAM() {
                 setUsers(res.data);
                 setLoaded(true);
             } catch (e) {
-                // TODO: send error noti/alert
-                console.error(e);
+                addNotification({
+                    type: "error",
+                    message: "Failed to load users",
+                });
             }
         })();
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [reloadTrigger]);
 
     return (
         <section className="IAM flex-vert-gap1">
             <h1>Users / IAM</h1>
             {!roles.accessManager && <ViewOnlyAlert/>}
             {!loaded && <Alert type="loading">Loading users...</Alert>}
-            {users.map(user => <UserItem key={"user-" + user.uid} user={user} isManager={roles.accessManager}/>)}
+            {users.map(user => <UserItem
+                key={"user-" + user.uid}
+                user={user} isManager={roles.accessManager}
+                triggerReload={triggerReload}
+            />)}
         </section>
     )
 }
 
-function UserItem({user, isManager}: { user: UserWithClaims, isManager: boolean }) {
-    const {addNotification} = useContext(NotificationsContext);
+interface UserItemProps {
+    user: UserWithClaims,
+    isManager: boolean,
+    triggerReload: (action: () => Promise<void>) => () => Promise<void>;
+}
+
+function UserItem({user, isManager, triggerReload}: UserItemProps) {
+    const {addNotification: withNoti} = useContext(NotificationsContext);
 
     const statusProps = getStatusProps(user.customClaims);
 
@@ -74,8 +95,18 @@ function UserItem({user, isManager}: { user: UserWithClaims, isManager: boolean 
     const updateRole = (role: keyof UserRoles, value: boolean) =>
         setRoles(prev => ({...prev, [role]: value}));
 
-    const [statusActionConfOpen, setStatusActionConfOpen] = useState(false);
     const [rolesUpdateConfOpen, setRolesUpdateConfOpen] = useState(false);
+
+    const handleRolesUpdate = () => withNoti({
+        type: "loading",
+        messages: {
+            loading: "Updating roles...",
+            success: "Roles updated successfully",
+            error: "Failed to update roles"
+        },
+        action: triggerReload(
+            async () => await apiClient.put(apiUrls.users.updateRoles(user.uid), changedRoles))
+    });
 
     return (
         <article className="UserItem">
@@ -91,10 +122,11 @@ function UserItem({user, isManager}: { user: UserWithClaims, isManager: boolean 
                 <div className="UserItem__status">
                     <b className={"UserItem__status-" + statusProps.clazz!}>{statusProps.text}</b>
                     {isManager && <div className="UserItem__status__actions">
-                        {statusProps.actions.map(action => <button
-                            key={`user-${user.uid}_action-${action}`}
-                            onClick={() => handleStatusAction(user, action)}
-                        >{buttonLabels[action]}</button>)}
+                        {statusProps.actions.map(action => (
+                            <StatusActionButton key={`user-${user.uid}_status-${action}`}
+                                                user={user} action={action}
+                                                triggerReload={triggerReload}/>
+                        ))}
                     </div>}
                 </div>
             )}
@@ -124,7 +156,7 @@ function UserItem({user, isManager}: { user: UserWithClaims, isManager: boolean 
                 onClose={() => setRolesUpdateConfOpen(false)}
                 onConfirm={() => {
                     setRolesUpdateConfOpen(false);
-                    handleRolesUpdate(user, roles, addNotification);
+                    handleRolesUpdate();
                 }}
                 title="Update roles"
             >
@@ -141,27 +173,69 @@ function UserItem({user, isManager}: { user: UserWithClaims, isManager: boolean 
     );
 }
 
-type StatusAction = "grant" | "deny" | "revoke";
+type StatusAction = "grant" | "deny" | "revoke" | "reset";
 const buttonLabels: Record<StatusAction, string> = {
     grant: "Grant access",
     deny: "Deny access",
-    revoke: "Revoke access"
+    revoke: "Revoke access",
+    reset: "Reset claims"
 };
-
-function handleStatusAction(user: UserWithClaims, action: StatusAction) {
-    // TODO: implement
-    console.log("handleStatusAction", user.uid, action);
-}
 
 function getStatusProps(claims: UserClaims): {
     text: string,
     clazz: string,
     actions: StatusAction[]
 } | null {
-    if (claims.accessDenied) return {text: "Denied", clazz: "denied", actions: []};
+    if (claims.accessDenied) return {text: "Denied", clazz: "denied", actions: ["reset"]};
     if (claims.accessRequested) return {text: "Requested access", clazz: "requested", actions: ["grant", "deny"]};
     if (claims.admin) return {text: "Active", clazz: "active", actions: ["revoke"]};
     return null;
+}
+
+interface StatusActionButtonProps {
+    user: UserWithClaims,
+    action: StatusAction,
+    triggerReload: (action: () => Promise<void>) => () => Promise<void>;
+}
+
+function StatusActionButton({user, action, triggerReload}: StatusActionButtonProps) {
+    const [confOpen, setConfOpen] = useState(false);
+
+    const {addNotification: withNoti} = useContext(NotificationsContext);
+
+    const handleAction = () => withNoti({
+        type: "loading",
+        messages: {
+            loading: "Updating user status...",
+            success: "User status updated successfully",
+            error: "Failed to update user status"
+        },
+        action: triggerReload(async () => {
+            if (action === "grant" || action === "deny")
+                await apiClient.post(apiUrls.users.grantAccess(user.uid), {grant: action === "grant"});
+            else if (action === "revoke") await apiClient.post(apiUrls.users.revokeAccess(user.uid));
+            /* TODO: Backend needs fix to require AM authorization
+                     when given user has denied access and wants to clear it */
+            else await apiClient.post(apiUrls.users.setDefaultClaims(user.uid));
+        })
+    })
+
+    return (
+        <>
+            <button>{buttonLabels[action]}</button>
+            <ConfirmationModal
+                isOpen={confOpen}
+                onClose={() => setConfOpen(false)}
+                onConfirm={() => {
+                    setConfOpen(false);
+                    handleAction();
+                }}
+                title={buttonLabels[action]}
+            >
+                <></>
+            </ConfirmationModal>
+        </>
+    )
 }
 
 const rolesLabels: Record<keyof UserRoles, string> = {
@@ -169,16 +243,3 @@ const rolesLabels: Record<keyof UserRoles, string> = {
     guestManager: "Guest Manager",
     accessManager: "Access Manager"
 };
-
-function handleRolesUpdate(user: UserWithClaims, roles: UserRoles, addNoti: any) {
-    // TODO: implement
-    console.log("handleRolesUpdate", user.uid, roles);
-    addNoti({
-        messages: {
-            loading: "Updating roles...",
-            success: "Roles updated successfully",
-            error: "Failed to update roles"
-        },
-        action: () => new Promise(resolve => setTimeout(resolve, 2000))
-    });
-}
