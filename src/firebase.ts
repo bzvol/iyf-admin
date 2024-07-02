@@ -1,5 +1,5 @@
 import {initializeApp} from "firebase/app";
-import {getAuth, GoogleAuthProvider, User} from "firebase/auth";
+import {getAuth, GoogleAuthProvider, User, setPersistence, browserSessionPersistence} from "firebase/auth";
 import {useEffect, useState} from "react";
 import apiUrls, {apiClient} from "./api";
 
@@ -17,6 +17,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+setPersistence(auth, browserSessionPersistence);
 export const provider = new GoogleAuthProvider();
 
 interface IAuth {
