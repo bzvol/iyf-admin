@@ -12,6 +12,8 @@ export interface Notification {
         error: string;
     };
     action?: () => Promise<void>;
+    onSuccess?: () => void;
+    onError?: () => void;
     timestamp?: number;
 }
 
@@ -43,8 +45,8 @@ export default function Notifications() {
             <div className="Notifications-items">
                 {notifications.map(noti => noti.type === "loading" ? (
                     <LoadingNotification key={`notification-${noti.timestamp}`}
-                                         action={noti.action!}
                                          messages={noti.messages!}
+                                         action={noti.action!} onSuccess={noti.onSuccess} onError={noti.onError}
                     />
                 ) : (
                     <Alert key={`notification-${noti.timestamp}`} type={noti.type}>
@@ -77,12 +79,14 @@ export function NotificationToasts() {
 }
 
 interface LoadingNotificationProps {
-    action: () => Promise<void>;
     messages: {
         loading: string;
         success: string;
         error: string
     };
+    action: () => Promise<void>;
+    onSuccess?: () => void;
+    onError?: () => void;
 }
 
 function LoadingNotification(props: LoadingNotificationProps) {
@@ -93,11 +97,13 @@ function LoadingNotification(props: LoadingNotificationProps) {
             try {
                 await props.action();
                 setStatus("success");
+                props.onSuccess?.();
             } catch (e) {
                 setStatus("error");
+                props.onError?.();
             }
-        })(); // eslint-disable-next-line
-    }, []);
+        })();
+    }, [props.action]);
 
     return (
         <Alert type={status}>
@@ -118,13 +124,15 @@ function LoadingNotificationToast(props: LoadingNotificationProps) {
             try {
                 await props.action();
                 setStatus("success");
+                props.onSuccess?.();
             } catch (e) {
                 setStatus("error");
+                props.onError?.();
             } finally {
                 setTimeout(() => setShow(false), 3000);
             }
-        })(); // eslint-disable-next-line
-    }, []);
+        })();
+    }, [props.action]);
 
     return (
         <div className={`NotificationToast-wrapper${show ? " NotificationToast-show" : ""}`}>
