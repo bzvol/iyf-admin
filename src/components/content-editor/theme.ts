@@ -8,6 +8,8 @@ const theme = {
         h5: 'editor-heading-h5',
     },
     image: 'editor-image',
+    imageWrapper: 'editor-image-wrapper',
+    imageRemoveBtn: 'editor-image-remove-btn',
     link: 'editor-link',
     list: {
         listitem: 'editor-listitem',

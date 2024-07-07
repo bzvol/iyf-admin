@@ -25,8 +25,36 @@
 
 .editor-image {
   display: block;
-  text-align: center;
-  max-width: min(500px, 100% - 2rem);
-  max-height: min(500px, 100% - 2rem);
+  position: relative;
+  max-width: min(500px, 100%);
+  max-height: min(500px, 100%);
   margin: 0 auto 1rem;
+
+  & > img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  & > button {
+    display: none;
+    place-items: center;
+    position: absolute;
+    width: 2rem;
+    height: 2rem;
+    top: .5rem;
+    right: .5rem;
+    padding: 0;
+    background: red;
+    color: white;
+    border-radius: 50%;
+
+    &:hover {
+      background: #ce0000;
+    }
+  }
+
+  &:hover > button {
+    display: grid;
+  }
 }
+

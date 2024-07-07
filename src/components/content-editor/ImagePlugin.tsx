@@ -10,6 +10,7 @@ import {
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import React, {ReactNode, useEffect} from "react";
 import {$insertNodeToNearestRoot} from "@lexical/utils";
+import {Close} from "@mui/icons-material";
 
 interface ImageAttributes {
     src: string;
@@ -75,11 +76,8 @@ export class ImageNode extends DecoratorNode<ReactNode> {
     }
 
     createDOM(config: EditorConfig): HTMLElement {
-        const element = document.createElement('img');
-        if (config.theme.image) element.classList.add(config.theme.image);
-        element.src = this.__src;
-        if (this.__alt) element.alt = this.__alt;
-        if (this.__title) element.title = this.__title;
+        const element = document.createElement('div');
+        element.className = config.theme.image || "";
         return element;
     }
 
@@ -87,9 +85,15 @@ export class ImageNode extends DecoratorNode<ReactNode> {
         return false;
     }
 
-    decorate(_: LexicalEditor, config: EditorConfig): React.ReactNode {
-        return <img src={this.__src} alt={this.__alt} title={this.__title}
-                    className={config.theme.image || ""}/>;
+    decorate(editor: LexicalEditor, _: EditorConfig): React.ReactNode {
+        const handleRemove = () => editor.update(() => this.remove());
+
+        return (
+            <>
+                <img src={this.__src} alt={this.__alt} title={this.__title}/>
+                {editor.isEditable() && <button onClick={handleRemove}><Close/></button>}
+            </>
+        );
     }
 }
 

@@ -2208,7 +2208,7 @@
     "@lexical/utils" "0.16.1"
     lexical "0.16.1"
 
-"@lexical/html@0.16.1":
+"@lexical/html@0.16.1", "@lexical/html@^0.16.1":
   version "0.16.1"
   resolved "https://registry.yarnpkg.com/@lexical/html/-/html-0.16.1.tgz#40211fda59246ff797a63b060787cb76a31608d2"
   integrity sha512-vbtAdCvQ3PaAqa5mFmtmrvbiAvjCu1iXBAJ0bsHqFXCF2Sba5LwHVe8dUAOTpfEZEMbiHfjul6b5fj4vNPGF2A==
