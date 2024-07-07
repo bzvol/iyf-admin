@@ -27,7 +27,7 @@ button, input, textarea {
   font-family: inherit;
 }
 
-ul, li {
+ul, ol, li {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -113,6 +113,10 @@ code {
   padding: 0.2rem 0.5rem;
   border-radius: 0.5rem;
   margin-top: .3rem;
+}
+
+[contenteditable] {
+  outline: none;
 }
 
 .no-select {

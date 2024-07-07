@@ -5,6 +5,7 @@ import Posts from "./pages/iyf/Posts";
 import {useEffect} from "react";
 import Events from "./pages/iyf/Events";
 import IAM from "./pages/IAM";
+import CreatePost from "./pages/iyf/CreatePost";
 
 export default function App() {
     useEffect(() => {
@@ -31,7 +32,11 @@ export default function App() {
                         },
                         {
                             path: "/iyf/posts",
-                            element: <Posts/>
+                            element: <Posts/>,
+                        },
+                        {
+                            path: "/iyf/posts/create",
+                            element: <CreatePost/>
                         },
                         {
                             path: "/iyf/events",

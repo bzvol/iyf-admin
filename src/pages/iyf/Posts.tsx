@@ -1,7 +1,7 @@
 import './styles/Posts.scss';
 import './styles/common.scss';
-import apiUrls, {apiClient, Post, Status} from "../../api";
-import {useEffect, useState} from "react";
+import apiUrls, {apiClient, Post} from "../../api";
+import React, {useEffect, useState} from "react";
 import {useAuth} from "../../firebase";
 import {Add, Delete, Edit, MoreVert} from "@mui/icons-material";
 import {capitalize, getFirstName, getMetadataTitle, StatusAction, StatusIcon} from './common';
@@ -9,6 +9,7 @@ import SearchBar from '../../components/SearchBar';
 import UserPhoto from "../../components/UserPhoto";
 import ViewOnlyAlert from "../../components/ViewOnlyAlert";
 import Alert from "../../components/Alert";
+import {Link} from "react-router-dom";
 
 export default function Posts() {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -62,7 +63,7 @@ export default function Posts() {
             <h1>Posts</h1>
             <div className="schgrid__actions">
                 {roles.contentManager
-                    ? <button className="icon-n-text" onClick={handleCreate}><Add/> Create</button>
+                    ? <Link to="/iyf/posts/create"><button className="icon-n-text"><Add/> Create</button></Link>
                     : <ViewOnlyAlert/>}
                 <SearchBar onSearch={handleSearch}/>
             </div>
@@ -83,17 +84,6 @@ export default function Posts() {
 
 function PostItem({showOptions, ...props}: { post: Post; showOptions: boolean; }) {
     const [post, setPost] = useState<Post>(props.post);
-
-    async function handleStatusAction(status: Status) {
-        try {
-            post.status = status === "draft" || status === "archived" ? "published" : "archived";
-            const res = await apiClient.put<Post>(apiUrls.posts.update(post.id), post)
-            setPost(res.data);
-        } catch (e) {
-            // TODO: Send error noti/alert
-            console.error("Error updating post", e);
-        }
-    }
 
     return (
         <article className="schgrid__item">
@@ -131,7 +121,7 @@ function PostItem({showOptions, ...props}: { post: Post; showOptions: boolean; }
                             <Delete/> Delete
                             <div/>
                         </li>
-                        <li onClick={() => handleStatusAction(post.status)}>
+                        <li onClick={() => handleStatusAction(post, setPost)}>
                             <div/>
                             <StatusAction status={post.status}/>
                             <div/>
@@ -146,7 +136,13 @@ function PostItem({showOptions, ...props}: { post: Post; showOptions: boolean; }
     );
 }
 
-// TODO: Implement create
-function handleCreate() {
-    console.log("Creating new post");
+async function handleStatusAction(post: Post, setPost: React.Dispatch<React.SetStateAction<Post>>) {
+    try {
+        post.status = post.status === "draft" || post.status === "archived" ? "published" : "archived";
+        const res = await apiClient.put<Post>(apiUrls.posts.update(post.id), post)
+        setPost(res.data);
+    } catch (e) {
+        // TODO: Send error noti/alert
+        console.error("Error updating post", e);
+    }
 }

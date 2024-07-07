@@ -6,7 +6,7 @@ import {Profile} from "./Profile";
 import NavMenu from "./NavMenu";
 import Notifications from "./Notifications";
 
-const lastUpdated = "2024-05-26";
+const lastUpdated = "2024-07-05";
 
 export default function Sidebar() {
     const [menuOpen, setMenuOpen] = useState(false);

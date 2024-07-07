@@ -1,0 +1,14 @@
+.CreatePost {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+
+  & > a {
+    align-self: flex-start;
+  }
+
+  & > div {
+    flex-grow: 1;
+  }
+}

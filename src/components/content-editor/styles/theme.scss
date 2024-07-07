@@ -1,0 +1,32 @@
+.editor-paragraph, [class*="editor-heading-"],
+.editor-list-ul, .editor-list-ol, .editor-image {
+  margin-bottom: 1rem;
+}
+
+.editor-link {
+  color: #007bff !important;
+  text-decoration: underline !important;
+  cursor: pointer;
+}
+
+.editor-list {
+  &-ul > .editor-listitem {
+    list-style: disc;
+  }
+
+  &-ol > .editor-listitem {
+    list-style: decimal;
+  }
+}
+
+.editor-listitem {
+  margin-left: 1rem;
+}
+
+.editor-image {
+  display: block;
+  text-align: center;
+  max-width: min(500px, 100% - 2rem);
+  max-height: min(500px, 100% - 2rem);
+  margin: 0 auto 1rem;
+}
