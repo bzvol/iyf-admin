@@ -3,7 +3,10 @@ import {useContext} from "react";
 
 export function useNotifications() {
     const {setNotifications} = useContext(NotificationsContext);
-    return (notification: Notification) => setNotifications(prev => [notification, ...prev]);
+    return (notification: Notification) => setNotifications(prev => [{
+        ...notification,
+        timestamp: Date.now()
+    }, ...prev]);
 }
 
 class Trigger {
@@ -25,7 +28,10 @@ export function createTrigger(): Trigger {
     return new Trigger();
 }
 
-export function useTrigger(trigger: Trigger) {
+export function useTrigger(trigger: Trigger): [
+    () => void,
+    (action: () => Promise<void>) => () => Promise<void>
+] {
     return [trigger.trigger, trigger.awaiter];
 }
 
