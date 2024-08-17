@@ -1,40 +1,28 @@
 import {Notification, NotificationsContext} from "./components/sidebar/Notifications";
-import {useContext} from "react";
+import {createContext, useCallback, useContext, useState} from "react";
 
 export function useNotifications() {
     const {setNotifications} = useContext(NotificationsContext);
-    return (notification: Notification) => setNotifications(prev => [{
+    return useCallback((notification: Notification) => setNotifications(prev => [{
         ...notification,
         timestamp: Date.now()
-    }, ...prev]);
+    }, ...prev]), [setNotifications]);
 }
 
-class Trigger {
-    value = false;
+type Trigger = () => void;
 
-    trigger() {
-        this.value = !this.value;
-    }
-
-    awaiter(action: () => Promise<void>): () => Promise<void> {
-        return async () => {
-            await action();
-            this.trigger();
-        }
-    }
+export function createTriggerContext() {
+    return createContext<Trigger | null>(null);
 }
 
-export function createTrigger(): Trigger {
-    return new Trigger();
+export function useCreateTrigger() {
+    const [value, setValue] = useState(false);
+    const trigger = useCallback(() => setValue(prev => !prev), []);
+    return {trigger, value};
 }
 
-export function useTrigger(trigger: Trigger): [
-    () => void,
-    (action: () => Promise<void>) => () => Promise<void>
-] {
-    return [trigger.trigger, trigger.awaiter];
-}
-
-export function useTriggerListener(trigger: Trigger) {
-    return trigger.value;
+export function useTrigger(triggerContext: React.Context<Trigger | null>) {
+    const trigger = useContext(triggerContext);
+    if (!trigger) throw new Error("No trigger is provided for this context");
+    return trigger;
 }

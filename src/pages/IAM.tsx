@@ -3,11 +3,11 @@ import {useAuth} from "../firebase";
 import UserPhoto from "../components/UserPhoto";
 import ViewOnlyAlert from "../components/ViewOnlyAlert";
 import {User} from "firebase/auth";
-import React, {useContext, useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import apiUrls, {apiClient} from "../api";
 import Alert from "../components/Alert";
-import {NotificationsContext} from "../components/sidebar/Notifications";
 import ConfirmationModal from "../components/ConfirmationModal";
+import {createTriggerContext, useCreateTrigger, useNotifications, useTrigger} from "../utils";
 
 type UserWithClaims = User & { customClaims: UserClaims };
 type UserClaims = {
@@ -21,19 +21,16 @@ type UserRoles = {
     accessManager: boolean
 };
 
+const IAMTrigger = createTriggerContext();
+
 export default function IAM() {
     const [users, setUsers] = useState<UserWithClaims[]>([]);
     const [loaded, setLoaded] = useState(false);
-    const [reloadTrigger, setTrigger] = useState(false);
-
-    const triggerReload = (action: () => Promise<void>) => async () => {
-        await action();
-        setTrigger(prev => !prev);
-    }
 
     const {roles} = useAuth();
 
-    const {addNotification} = useContext(NotificationsContext);
+    const addNotification = useNotifications();
+    const {trigger, value: triggerVal} = useCreateTrigger();
 
     useEffect(() => {
         (async () => {
@@ -49,30 +46,31 @@ export default function IAM() {
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [reloadTrigger]);
+    }, [triggerVal]);
 
     return (
         <section className="IAM flex-vert-gap1">
             <h1>Users / IAM</h1>
             {!roles.accessManager && <ViewOnlyAlert/>}
             {!loaded && <Alert type="loading">Loading users...</Alert>}
-            {users.map(user => <UserItem
-                key={"user-" + user.uid}
-                user={user} isManager={roles.accessManager}
-                triggerReload={triggerReload}
-            />)}
+            <IAMTrigger.Provider value={trigger}>
+                {users.map(user => <UserItem
+                    key={"user-" + user.uid}
+                    user={user} isManager={roles.accessManager}
+                />)}
+            </IAMTrigger.Provider>
         </section>
     )
 }
 
 interface UserItemProps {
     user: UserWithClaims,
-    isManager: boolean,
-    triggerReload: (action: () => Promise<void>) => () => Promise<void>;
+    isManager: boolean
 }
 
-function UserItem({user, isManager, triggerReload}: UserItemProps) {
-    const {addNotification: withNoti} = useContext(NotificationsContext);
+function UserItem({user, isManager}: UserItemProps) {
+    const withNoti = useNotifications();
+    const trigger = useTrigger(IAMTrigger);
 
     const statusProps = getStatusProps(user.customClaims);
 
@@ -104,8 +102,10 @@ function UserItem({user, isManager, triggerReload}: UserItemProps) {
             success: "Roles updated successfully",
             error: "Failed to update roles"
         },
-        action: triggerReload(
-            async () => await apiClient.put(apiUrls.users.updateRoles(user.uid), changedRoles))
+        action: async () => {
+            await apiClient.put(apiUrls.users.updateRoles(user.uid), changedRoles);
+            trigger();
+        }
     });
 
     return (
@@ -124,8 +124,7 @@ function UserItem({user, isManager, triggerReload}: UserItemProps) {
                     {isManager && <div className="UserItem__status__actions">
                         {statusProps.actions.map(action => (
                             <StatusActionButton key={`user-${user.uid}_status-${action}`}
-                                                user={user} action={action}
-                                                triggerReload={triggerReload}/>
+                                                user={user} action={action}/>
                         ))}
                     </div>}
                 </div>
@@ -194,14 +193,14 @@ function getStatusProps(claims: UserClaims): {
 
 interface StatusActionButtonProps {
     user: UserWithClaims,
-    action: StatusAction,
-    triggerReload: (action: () => Promise<void>) => () => Promise<void>;
+    action: StatusAction
 }
 
-function StatusActionButton({user, action, triggerReload}: StatusActionButtonProps) {
+function StatusActionButton({user, action}: StatusActionButtonProps) {
     const [confOpen, setConfOpen] = useState(false);
 
-    const {addNotification: withNoti} = useContext(NotificationsContext);
+    const withNoti = useNotifications();
+    const trigger = useTrigger(IAMTrigger);
 
     const handleAction = () => withNoti({
         type: "loading",
@@ -210,19 +209,20 @@ function StatusActionButton({user, action, triggerReload}: StatusActionButtonPro
             success: "User status updated successfully",
             error: "Failed to update user status"
         },
-        action: triggerReload(async () => {
+        action: async () => {
             if (action === "grant" || action === "deny")
                 await apiClient.post(apiUrls.users.grantAccess(user.uid), {grant: action === "grant"});
             else if (action === "revoke") await apiClient.post(apiUrls.users.revokeAccess(user.uid));
-            /* TODO: Backend needs fix to require AM authorization
-                     when given user has denied access and wants to clear it */
+            // FIXME: API will respond with error, default claims cannot be reset - new endpoint needed
             else await apiClient.post(apiUrls.users.setDefaultClaims(user.uid));
-        })
+
+            trigger();
+        }
     })
 
     return (
         <>
-            <button>{buttonLabels[action]}</button>
+            <button onClick={() => setConfOpen(true)}>{buttonLabels[action]}</button>
             <ConfirmationModal
                 isOpen={confOpen}
                 onClose={() => setConfOpen(false)}
@@ -232,7 +232,7 @@ function StatusActionButton({user, action, triggerReload}: StatusActionButtonPro
                 }}
                 title={buttonLabels[action]}
             >
-                <></>
+                Are you sure you want to <b>{buttonLabels[action].toLowerCase()}</b> for <b>{user.displayName}</b>?
             </ConfirmationModal>
         </>
     )
