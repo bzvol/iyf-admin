@@ -40,6 +40,7 @@ export default function Posts() {
                 });
             }
         })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [triggerVal]);
 
     // If there are more than 50 posts, the filter will

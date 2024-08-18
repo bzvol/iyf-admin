@@ -103,6 +103,7 @@ function LoadingNotification(props: LoadingNotificationProps) {
                 props.onError?.();
             }
         })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.action]);
 
     return (
@@ -132,6 +133,7 @@ function LoadingNotificationToast(props: LoadingNotificationProps) {
                 setTimeout(() => setShow(false), 3000);
             }
         })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.action]);
 
     return (

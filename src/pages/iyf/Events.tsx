@@ -40,6 +40,7 @@ export default function Events() {
                 });
             }
         })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [triggerVal]);
 
     // If there are more than 50 events, the filter will
