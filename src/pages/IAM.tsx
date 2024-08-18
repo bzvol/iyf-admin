@@ -30,7 +30,7 @@ export default function IAM() {
     const {roles} = useAuth();
 
     const addNotification = useNotifications();
-    const {trigger, value: triggerVal} = useCreateTrigger();
+    const {trigger, triggerVal} = useCreateTrigger();
 
     useEffect(() => {
         (async () => {

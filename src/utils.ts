@@ -18,7 +18,7 @@ export function createTriggerContext() {
 export function useCreateTrigger() {
     const [value, setValue] = useState(false);
     const trigger = useCallback(() => setValue(prev => !prev), []);
-    return {trigger, value};
+    return {trigger, triggerVal: value};
 }
 
 export function useTrigger(triggerContext: React.Context<Trigger | null>) {

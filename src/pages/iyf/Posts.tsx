@@ -1,6 +1,6 @@
 import './styles/Posts.scss';
 import './styles/common.scss';
-import apiUrls, {apiClient, Post} from "../../api";
+import apiUrls, {apiClient, Post, Status} from "../../api";
 import React, {useEffect, useState} from "react";
 import {useAuth} from "../../firebase";
 import {Add, Delete, Edit, MoreVert} from "@mui/icons-material";
@@ -9,31 +9,38 @@ import SearchBar from '../../components/SearchBar';
 import UserPhoto from "../../components/UserPhoto";
 import ViewOnlyAlert from "../../components/ViewOnlyAlert";
 import Alert from "../../components/Alert";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import {createTriggerContext, useCreateTrigger, useNotifications, useTrigger} from "../../utils";
+import ConfirmationModal from "../../components/ConfirmationModal";
+
+const PostsTrigger = createTriggerContext();
 
 export default function Posts() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loaded, setLoaded] = useState(false);
     const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
 
+    const addNotification = useNotifications();
+    const {trigger, triggerVal} = useCreateTrigger();
+
     const {roles} = useAuth();
 
-    const loadPosts = async () => {
-        try {
-            setLoaded(false);
-            const postsRes = await apiClient.get<Post[]>(apiUrls.posts.list);
-            setPosts(postsRes.data);
-            setFilteredPosts(postsRes.data);
-            setLoaded(true);
-        } catch (e) {
-            // TODO: Send error noti/alert
-            console.error("Error fetching posts", e);
-        }
-    };
-
     useEffect(() => {
-        loadPosts();
-    }, []);
+        (async () => {
+            try {
+                setLoaded(false);
+                const postsRes = await apiClient.get<Post[]>(apiUrls.posts.list);
+                setPosts(postsRes.data);
+                setFilteredPosts(postsRes.data);
+                setLoaded(true);
+            } catch (e) {
+                addNotification({
+                    type: "error",
+                    message: "Failed to load posts"
+                });
+            }
+        })();
+    }, [triggerVal]);
 
     // If there are more than 50 posts, the filter will
     // only be applied 500ms after the user stops typing.
@@ -63,7 +70,9 @@ export default function Posts() {
             <h1>Posts</h1>
             <div className="schgrid__actions">
                 {roles.contentManager
-                    ? <Link to="/iyf/posts/create"><button className="icon-n-text"><Add/> Create</button></Link>
+                    ? <Link to="/iyf/posts/create">
+                        <button className="icon-n-text"><Add/> Create</button>
+                    </Link>
                     : <ViewOnlyAlert/>}
                 <SearchBar onSearch={handleSearch}/>
             </div>
@@ -73,17 +82,56 @@ export default function Posts() {
                     ? `Showing ${filteredPosts.length} of ${posts.length} posts`
                     : posts.length === 0 ? "There are not yet any posts." : "No posts found.")}
             </div>
-            <div className="schgrid">
-                {filteredPosts.map((post) => (
-                    <PostItem key={"post" + post.id} post={post} showOptions={roles.contentManager}/>
-                ))}
-            </div>
+            <PostsTrigger.Provider value={trigger}>
+                <div className="schgrid">
+                    {filteredPosts.map((post) => (
+                        <PostItem key={"post" + post.id} post={post} showOptions={roles.contentManager}/>
+                    ))}
+                </div>
+            </PostsTrigger.Provider>
         </section>
     );
 }
 
-function PostItem({showOptions, ...props}: { post: Post; showOptions: boolean; }) {
-    const [post, setPost] = useState<Post>(props.post);
+interface PostItemProps {
+    post: Post;
+    showOptions: boolean;
+}
+
+function PostItem({post, showOptions}: PostItemProps) {
+    const withNoti = useNotifications();
+    const trigger = useTrigger(PostsTrigger);
+    const navigate = useNavigate();
+
+    const [deleteConfOpen, setDeleteConfOpen] = useState(false);
+    const [statusActionConfOpen, setStatusActionConfOpen] = useState(false);
+
+    const handleDelete = () => withNoti({
+        type: "loading",
+        messages: {
+            loading: "Deleting post...",
+            success: "Post deleted successfully",
+            error: "Failed to delete post"
+        },
+        action: async () => {
+            await apiClient.delete(apiUrls.posts.delete(post.id));
+            trigger();
+        }
+    });
+
+    const handleStatusAction = () => withNoti({
+        type: "loading",
+        messages: {
+            loading: (post.status === "published" ? "Archiving" : "Publishing") + " post...",
+            success: "Post " + (post.status === "published" ? "archived" : "published") + " successfully",
+            error: "Failed to " + (post.status === "published" ? "archive" : "publish") + " post"
+        },
+        action: async () => {
+            const newStatus: Status = post.status === "published" ? "archived" : "published";
+            await apiClient.put(apiUrls.posts.update(post.id), {...post, status: newStatus});
+            trigger();
+        }
+    });
 
     return (
         <article className="schgrid__item">
@@ -111,17 +159,18 @@ function PostItem({showOptions, ...props}: { post: Post; showOptions: boolean; }
                 {showOptions && <div className="schgrid__item__options">
                     <MoreVert/>
                     <ul className="schgrid__item__options-menu">
-                        <li onClick={() => console.log("Editing post " + post.id)}>
+                        <li onClick={() => navigate(`/posts/${post.id}/edit`, {state: post})}>
                             <div/>
                             <Edit/> Edit
                             <div/>
                         </li>
-                        <li onClick={() => console.log("Deleting post " + post.id)}>
-                            <div/>
-                            <Delete/> Delete
-                            <div/>
-                        </li>
-                        <li onClick={() => handleStatusAction(post, setPost)}>
+                        {post.status === "draft" &&
+                            <li onClick={() => setDeleteConfOpen(true)}>
+                                <div/>
+                                <Delete/> Delete
+                                <div/>
+                            </li>}
+                        <li onClick={() => setStatusActionConfOpen(true)}>
                             <div/>
                             <StatusAction status={post.status}/>
                             <div/>
@@ -132,17 +181,29 @@ function PostItem({showOptions, ...props}: { post: Post; showOptions: boolean; }
 
             <h2>{post.title}</h2>
             <p>{post.content}</p>
+
+            <ConfirmationModal
+                isOpen={deleteConfOpen}
+                onClose={() => setDeleteConfOpen(false)}
+                onConfirm={() => {
+                    setDeleteConfOpen(false);
+                    handleDelete();
+                }}
+                title="Delete draft post"
+            >
+                Are you sure you want to delete this post? <b>This action cannot be undone.</b>
+            </ConfirmationModal>
+            <ConfirmationModal
+                isOpen={statusActionConfOpen}
+                onClose={() => setStatusActionConfOpen(false)}
+                onConfirm={() => {
+                    setStatusActionConfOpen(false);
+                    handleStatusAction();
+                }}
+                title={post.status === "published" ? "Archive post" : "Publish post"}
+            >
+                Are you sure you want to {post.status === "published" ? "archive" : "publish"} this post?
+            </ConfirmationModal>
         </article>
     );
-}
-
-async function handleStatusAction(post: Post, setPost: React.Dispatch<React.SetStateAction<Post>>) {
-    try {
-        post.status = post.status === "draft" || post.status === "archived" ? "published" : "archived";
-        const res = await apiClient.put<Post>(apiUrls.posts.update(post.id), post)
-        setPost(res.data);
-    } catch (e) {
-        // TODO: Send error noti/alert
-        console.error("Error updating post", e);
-    }
 }

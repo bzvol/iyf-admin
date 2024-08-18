@@ -39,6 +39,10 @@ export default function App() {
                             element: <CreatePost/>
                         },
                         {
+                            path: "/iyf/posts/:id/edit",
+                            element: <h1>Edit Post</h1>
+                        },
+                        {
                             path: "/iyf/events",
                             element: <Events/>
                         },

@@ -18,9 +18,9 @@ export default function CreatePost() {
                 success: 'Post created successfully.',
                 error: 'Failed to create post.'
             },
-            action: async () => apiClient.post(apiUrls.posts.create, {...state, tags: []})
+            action: async () => apiClient.post(apiUrls.posts.create, {...state, tags: []}),
+            onSuccess: () => navigate('/iyf/posts')
         });
-        setTimeout(() => navigate('/iyf/posts'), 5000);
     };
 
     return (
