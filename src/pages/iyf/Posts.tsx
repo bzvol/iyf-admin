@@ -159,7 +159,7 @@ function PostItem({post, showOptions}: PostItemProps) {
                 {showOptions && <div className="schgrid__item__options">
                     <MoreVert/>
                     <ul className="schgrid__item__options-menu">
-                        <li onClick={() => navigate(`/posts/${post.id}/edit`, {state: post})}>
+                        <li onClick={() => navigate(`/iyf/posts/${post.id}/edit`, {state: post})}>
                             <div/>
                             <Edit/> Edit
                             <div/>

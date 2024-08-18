@@ -47,6 +47,14 @@ export default function App() {
                             element: <Events/>
                         },
                         {
+                            path: "/iyf/events/create",
+                            element: <h1>Create event</h1>
+                        },
+                        {
+                            path: "/iyf/events/:id/edit",
+                            element: <h1>Edit event</h1>
+                        },
+                        {
                             path: "/iyf/regular",
                             element: <h1>Regular Events</h1>
                         }

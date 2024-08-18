@@ -1,6 +1,6 @@
 import './styles/Events.scss';
 import './styles/common.scss';
-import apiUrls, {Event, apiClient, Status} from "../../api";
+import apiUrls, {apiClient, Event, Status} from "../../api";
 import {useEffect, useState} from "react";
 import {useAuth} from "../../firebase";
 import {Add, Delete, Edit, MoreVert} from "@mui/icons-material";
@@ -9,30 +9,38 @@ import SearchBar from '../../components/SearchBar';
 import ViewOnlyAlert from "../../components/ViewOnlyAlert";
 import UserPhoto from "../../components/UserPhoto";
 import Alert from "../../components/Alert";
+import {createTriggerContext, useCreateTrigger, useNotifications, useTrigger} from "../../utils";
+import {Link, useNavigate} from "react-router-dom";
+import ConfirmationModal from "../../components/ConfirmationModal";
+
+const EventsTrigger = createTriggerContext();
 
 export default function Events() {
     const [events, setEvents] = useState<Event[]>([]);
     const [loaded, setLoaded] = useState(false);
     const [filteredEvents, setFilteredEvents] = useState<Event[]>(events);
 
+    const addNotification = useNotifications();
+    const {trigger, triggerVal} = useCreateTrigger();
+
     const {roles} = useAuth();
 
-    const loadEvents = async () => {
-        try {
-            setLoaded(false);
-            const eventsRes = await apiClient.get<Event[]>(apiUrls.events.list);
-            setEvents(eventsRes.data);
-            setFilteredEvents(eventsRes.data);
-            setLoaded(true);
-        } catch (e) {
-            // TODO: Send error noti/alert
-            console.error("Error fetching events", e);
-        }
-    }
-
     useEffect(() => {
-        loadEvents();
-    }, []);
+        (async () => {
+            try {
+                setLoaded(false);
+                const eventsRes = await apiClient.get<Event[]>(apiUrls.events.list);
+                setEvents(eventsRes.data);
+                setFilteredEvents(eventsRes.data);
+                setLoaded(true);
+            } catch (e) {
+                addNotification({
+                    type: "error",
+                    message: "Failed to load events"
+                });
+            }
+        })();
+    }, [triggerVal]);
 
     // If there are more than 50 events, the filter will
     // only be applied 500ms after the user stops typing.
@@ -62,38 +70,68 @@ export default function Events() {
             <h1>Events</h1>
             <div className="schgrid__actions">
                 {roles.contentManager
-                    ? <button className="icon-n-text" onClick={handleCreate}><Add/> Create</button>
+                    ? <Link to="/iyf/events/create">
+                        <button className="icon-n-text"><Add/> Create</button>
+                    </Link>
                     : <ViewOnlyAlert/>}
                 <SearchBar onSearch={handleSearch}/>
             </div>
-            {!loaded && <Alert type="loading">Loading events...</Alert> }
+            {!loaded && <Alert type="loading">Loading events...</Alert>}
             <div className="schgrid__filter-info">
                 {loaded && (filteredEvents.length !== 0
                     ? `Showing ${filteredEvents.length} of ${events.length} events`
                     : events.length === 0 ? "There are not yet any events." : "No events found.")}
             </div>
-            <div className="schgrid">
-                {filteredEvents.map((event) => (
-                    <EventItem key={"event" + event.id} event={event} showOptions={roles.contentManager}/>
-                ))}
-            </div>
+            <EventsTrigger.Provider value={trigger}>
+                <div className="schgrid">
+                    {filteredEvents.map((event) => (
+                        <EventItem key={"event" + event.id} event={event} showOptions={roles.contentManager}/>
+                    ))}
+                </div>
+            </EventsTrigger.Provider>
         </section>
     );
 }
 
-function EventItem({showOptions, ...props}: { event: Event; showOptions: boolean; }) {
-    const [event, setEvent] = useState<Event>(props.event);
+interface EventItemProps {
+    event: Event;
+    showOptions: boolean;
+}
 
-    async function handleStatusAction(status: Status) {
-        try {
-            event.status = status === "draft" || status === "archived" ? "published" : "archived";
-            const res = await apiClient.put<Event>(apiUrls.events.update(event.id), event)
-            setEvent(res.data);
-        } catch (e) {
-            // TODO: Send error noti/alert
-            console.error("Error updating event", e);
+function EventItem({event, showOptions}: EventItemProps) {
+    const [deleteConfOpen, setDeleteConfOpen] = useState(false);
+    const [statusActionConfOpen, setStatusActionConfOpen] = useState(false);
+
+    const withNoti = useNotifications();
+    const trigger = useTrigger(EventsTrigger);
+    const navigate = useNavigate();
+
+    const handleDelete = () => withNoti({
+        type: "loading",
+        messages: {
+            loading: "Deleting event...",
+            success: "Event deleted successfully",
+            error: "Failed to delete event"
+        },
+        action: async () => {
+            await apiClient.delete(apiUrls.events.delete(event.id));
+            trigger();
         }
-    }
+    })
+
+    const handleStatusAction = () => withNoti({
+        type: "loading",
+        messages: {
+            loading: (event.status === "published" ? "Archiving" : "Publishing") + " event...",
+            success: "Event " + (event.status === "published" ? "archived" : "published") + " successfully",
+            error: "Failed to " + (event.status === "published" ? "archive" : "publish") + " event"
+        },
+        action: async () => {
+            const newStatus: Status = event.status === "published" ? "archived" : "published";
+            await apiClient.put(apiUrls.events.update(event.id), {...event, status: newStatus});
+            trigger();
+        }
+    })
 
     return (
         <article className="schgrid__item">
@@ -121,17 +159,18 @@ function EventItem({showOptions, ...props}: { event: Event; showOptions: boolean
                 {showOptions && <div className="schgrid__item__options">
                     <MoreVert/>
                     <ul className="schgrid__item__options-menu">
-                        <li onClick={() => console.log("Editing event " + event.id)}>
+                        <li onClick={() => navigate(`/iyf/events/${event.id}/edit`, {state: event})}>
                             <div/>
                             <Edit/> Edit
                             <div/>
                         </li>
-                        <li onClick={() => console.log("Deleting event " + event.id)}>
-                            <div/>
-                            <Delete/> Delete
-                            <div/>
-                        </li>
-                        <li onClick={() => handleStatusAction(event.status)}>
+                        {event.status === "draft" &&
+                            <li onClick={() => setDeleteConfOpen(true)}>
+                                <div/>
+                                <Delete/> Delete
+                                <div/>
+                            </li>}
+                        <li onClick={() => setStatusActionConfOpen(true)}>
                             <div/>
                             <StatusAction status={event.status}/>
                             <div/>
@@ -142,11 +181,29 @@ function EventItem({showOptions, ...props}: { event: Event; showOptions: boolean
 
             <h2>{event.title}</h2>
             <p>{event.details}</p>
+
+            <ConfirmationModal
+                isOpen={deleteConfOpen}
+                onClose={() => setDeleteConfOpen(false)}
+                onConfirm={() => {
+                    setDeleteConfOpen(false);
+                    handleDelete();
+                }}
+                title="Delete draft event"
+            >
+                Are you sure you want to delete this event? <b>This action cannot be undone.</b>
+            </ConfirmationModal>
+            <ConfirmationModal
+                isOpen={statusActionConfOpen}
+                onClose={() => setStatusActionConfOpen(true)}
+                onConfirm={() => {
+                    setStatusActionConfOpen(false);
+                    handleStatusAction()
+                }}
+                title={(event.status === "published" ? "Archive" : "Publish") + " event"}
+            >
+                Are you sure you want to {event.status === "published" ? "archive" : "publish"} this event?
+            </ConfirmationModal>
         </article>
     );
-}
-
-// TODO: Implement create
-function handleCreate() {
-    console.log("Creating new event");
 }

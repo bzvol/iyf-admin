@@ -3,6 +3,7 @@ import apiUrls, {CountInfo, apiClient} from "../api";
 import {useEffect, useState} from "react";
 import {useAuth} from "../firebase";
 import Alert from "../components/Alert";
+import {useNotifications} from "../utils";
 
 export function Home() {
     const [countInfo, setContentInfo] = useState<CountInfo>({
@@ -11,6 +12,8 @@ export function Home() {
         regularEvents: {total: 0, draft: 0, published: 0, archived: 0}
     });
     const [loaded, setLoaded] = useState(false);
+
+    const addNotification = useNotifications();
 
     const {user} = useAuth();
     useEffect(() => {
@@ -22,8 +25,10 @@ export function Home() {
                 setContentInfo(res.data);
                 setLoaded(true);
             } catch (e) {
-                // TODO: Send error noti/alert
-                console.error("Error fetching counts", e);
+                addNotification({
+                    type: "error",
+                    message: "Failed to fetch counts"
+                });
             }
         })();
     }, [user]);
