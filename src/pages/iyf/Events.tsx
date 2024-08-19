@@ -1,7 +1,7 @@
 import './styles/Events.scss';
 import './styles/common.scss';
 import apiUrls, {apiClient, Event, Status} from "../../api";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useAuth} from "../../firebase";
 import {Add, Delete, Edit, MoreVert} from "@mui/icons-material";
 import {capitalize, getFirstName, getMetadataTitle, StatusAction, StatusIcon} from './common';
@@ -9,7 +9,7 @@ import SearchBar from '../../components/SearchBar';
 import ViewOnlyAlert from "../../components/ViewOnlyAlert";
 import UserPhoto from "../../components/UserPhoto";
 import Alert from "../../components/Alert";
-import {createTriggerContext, useCreateTrigger, useNotifications, useTrigger} from "../../utils";
+import {convertLexToPlain, createTriggerContext, useCreateTrigger, useNotifications, useTrigger} from "../../utils";
 import {Link, useNavigate} from "react-router-dom";
 import ConfirmationModal from "../../components/ConfirmationModal";
 
@@ -100,6 +100,8 @@ interface EventItemProps {
 }
 
 function EventItem({event, showOptions}: EventItemProps) {
+    const plainText = useMemo(() => convertLexToPlain(event.details), [event.details])
+
     const [deleteConfOpen, setDeleteConfOpen] = useState(false);
     const [statusActionConfOpen, setStatusActionConfOpen] = useState(false);
 
@@ -181,7 +183,7 @@ function EventItem({event, showOptions}: EventItemProps) {
             </div>
 
             <h2>{event.title}</h2>
-            <p>{event.details}</p>
+            <p>{plainText}</p>
 
             <ConfirmationModal
                 isOpen={deleteConfOpen}

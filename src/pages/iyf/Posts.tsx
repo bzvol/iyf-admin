@@ -1,7 +1,7 @@
 import './styles/Posts.scss';
 import './styles/common.scss';
 import apiUrls, {apiClient, Post, Status} from "../../api";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {useAuth} from "../../firebase";
 import {Add, Delete, Edit, MoreVert} from "@mui/icons-material";
 import {capitalize, getFirstName, getMetadataTitle, StatusAction, StatusIcon} from './common';
@@ -10,7 +10,7 @@ import UserPhoto from "../../components/UserPhoto";
 import ViewOnlyAlert from "../../components/ViewOnlyAlert";
 import Alert from "../../components/Alert";
 import {Link, useNavigate} from "react-router-dom";
-import {createTriggerContext, useCreateTrigger, useNotifications, useTrigger} from "../../utils";
+import {convertLexToPlain, createTriggerContext, useCreateTrigger, useNotifications, useTrigger} from "../../utils";
 import ConfirmationModal from "../../components/ConfirmationModal";
 
 const PostsTrigger = createTriggerContext();
@@ -100,6 +100,8 @@ interface PostItemProps {
 }
 
 function PostItem({post, showOptions}: PostItemProps) {
+    const plainText = useMemo(() => convertLexToPlain(post.content), [post.content])
+
     const withNoti = useNotifications();
     const trigger = useTrigger(PostsTrigger);
     const navigate = useNavigate();
@@ -181,7 +183,7 @@ function PostItem({post, showOptions}: PostItemProps) {
             </div>
 
             <h2>{post.title}</h2>
-            <p>{post.content}</p>
+            <p>{plainText}</p>
 
             <ConfirmationModal
                 isOpen={deleteConfOpen}
