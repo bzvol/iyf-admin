@@ -29,6 +29,7 @@ import Modal from "../Modal";
 import {TOGGLE_LINK_COMMAND} from "@lexical/link";
 import {NotificationsContext} from "../sidebar/Notifications";
 import {INSERT_IMAGE_COMMAND} from "./ImagePlugin";
+import apiUrls, {apiClient, ImageUpload} from "../../api";
 
 export function ToolbarPlugin() {
     return (
@@ -192,9 +193,24 @@ function ImagePlugin() {
             return;
         }
 
-        const src = await imageToB64(file);
+        const uploadData = new FormData();
+        uploadData.append('file', file);
 
-        editor.dispatchCommand(INSERT_IMAGE_COMMAND, {src});
+        addNotification({
+            type: 'loading',
+            messages: {
+                loading: 'Uploading image...',
+                success: 'Image uploaded successfully',
+                error: 'Failed to upload image'
+            },
+            action: async () => {
+                const {data: {url: src}} = await apiClient.post<ImageUpload>(apiUrls.images.upload,
+                    uploadData, {headers: {'Content-Type': 'multipart/form-data'}}
+                );
+
+                editor.dispatchCommand(INSERT_IMAGE_COMMAND, {src});
+            }
+        });
     }
 
     const handleClose = () => {
@@ -217,13 +233,6 @@ function ImagePlugin() {
         </>
     )
 }
-
-const imageToB64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-});
 
 type Alignment = 'left' | 'center' | 'right' | 'justify';
 

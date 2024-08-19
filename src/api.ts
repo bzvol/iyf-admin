@@ -27,6 +27,9 @@ const apiUrls = {
     info: {
         counts: `/info/counts`, // public
     },
+    images: {
+        upload: '/images',
+    },
     posts: {
         list: `/posts`, // public
         create: `/posts`,
@@ -82,6 +85,10 @@ export interface CountInfo {
         published: number;
         archived: number;
     }
+}
+
+export interface ImageUpload {
+    url: string;
 }
 
 export type Status = 'draft' | 'published' | 'archived';
