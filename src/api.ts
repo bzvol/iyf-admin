@@ -22,6 +22,7 @@ const apiUrls = {
         requestAccess: (id: string) => `/users/${id}/request-access`, // public
         grantAccess: (id: string) => `/users/${id}/grant-access`,
         revokeAccess: (id: string) => `/users/${id}/revoke-access`,
+        resetAccess: (id: string) => `/users/${id}/reset-access`,
         updateRoles: (id: string) => `/users/${id}/update-roles`,
     },
     info: {

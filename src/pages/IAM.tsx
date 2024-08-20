@@ -213,8 +213,7 @@ function StatusActionButton({user, action}: StatusActionButtonProps) {
             if (action === "grant" || action === "deny")
                 await apiClient.post(apiUrls.users.grantAccess(user.uid), {grant: action === "grant"});
             else if (action === "revoke") await apiClient.post(apiUrls.users.revokeAccess(user.uid));
-            // FIXME: API will respond with error, default claims cannot be reset - new endpoint needed
-            else await apiClient.post(apiUrls.users.setDefaultClaims(user.uid));
+            else await apiClient.post(apiUrls.users.resetAccess(user.uid));
 
             trigger();
         }
