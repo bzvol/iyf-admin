@@ -20,14 +20,11 @@ export interface Notification {
 interface NotificationsContextProps {
     notifications: Notification[];
     setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
-    addNotification: (notification: Notification) => void;
 }
 
 export const NotificationsContext = createContext<NotificationsContextProps>({
     notifications: [],
     setNotifications: () => {
-    },
-    addNotification: () => {
     }
 });
 

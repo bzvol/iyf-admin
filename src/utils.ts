@@ -34,8 +34,6 @@ export function useTrigger(triggerContext: React.Context<Trigger | null>) {
 
 // Convert Lexical JSON editor state to plain text
 export function convertLexToPlain(json: string) {
-    console.info("Converting " + json);
-
     const editor = createEditor({
         nodes: [HeadingNode, LinkNode, ListItemNode, ListNode, ImageNode],
         onError: () => {

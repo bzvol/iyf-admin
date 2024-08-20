@@ -13,15 +13,10 @@ export default function Root() {
     const isSmallScreen = useMediaQuery("(max-width: 992px)");
 
     const [notifications, setNotifications] = useState<Notification[]>([]);
-    const addNotification = (notification: Notification) =>
-        setNotifications(prev => [{
-            ...notification,
-            timestamp: Date.now()
-        }, ...prev])
 
     return (
         <div className="body">
-            <NotificationsContext.Provider value={{notifications, setNotifications, addNotification}}>
+            <NotificationsContext.Provider value={{notifications, setNotifications}}>
                 <Sidebar/>
                 <div className="main-wrapper">
                     {isSmallScreen && <header className="small-screen-header"><h1>IYF Admin</h1></header>}

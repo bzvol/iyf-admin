@@ -3,14 +3,14 @@ import ContentEditor, {ContentEditorState} from "../../components/content-editor
 import {Link, useNavigate} from "react-router-dom";
 import {ArrowBack} from "@mui/icons-material";
 import apiUrls, {apiClient} from "../../api";
-import React, {useContext, useState} from "react";
-import {NotificationsContext} from "../../components/sidebar/Notifications";
+import React, {useState} from "react";
 import {Tags} from "../../components/content-editor/Tags";
+import {useNotifications} from "../../utils";
 
 export default function CreatePost() {
     const [tags, setTags] = useState<string[]>([]);
 
-    const {addNotification: withNoti} = useContext(NotificationsContext);
+    const withNoti = useNotifications();
     const navigate = useNavigate();
 
     const handleSubmit = (state: ContentEditorState) => {

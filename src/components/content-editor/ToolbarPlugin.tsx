@@ -11,9 +11,10 @@ import {
     FormatListNumbered,
     FormatUnderlined,
     Image,
-    InsertLink, LinkOff
+    InsertLink,
+    LinkOff
 } from "@mui/icons-material";
-import React, {useContext, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import {
     $createParagraphNode,
     $getSelection,
@@ -27,9 +28,9 @@ import {$createHeadingNode} from "@lexical/rich-text";
 import {INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND} from "@lexical/list";
 import Modal from "../Modal";
 import {TOGGLE_LINK_COMMAND} from "@lexical/link";
-import {NotificationsContext} from "../sidebar/Notifications";
 import {INSERT_IMAGE_COMMAND} from "./ImagePlugin";
 import apiUrls, {apiClient, ImageUpload} from "../../api";
+import {useNotifications} from "../../utils";
 
 export function ToolbarPlugin() {
     return (
@@ -105,7 +106,7 @@ function LinkPlugin() {
     const urlInputRef = useRef<HTMLInputElement>(null);
     const [selection, setSelection] = useState<BaseSelection | null>(null);
 
-    const {addNotification} = useContext(NotificationsContext);
+    const addNotification = useNotifications();
 
     const handleInsertLink = () => editor.update(() => {
         const url = handleClose();
@@ -179,7 +180,7 @@ function ImagePlugin() {
     const [modalOpen, setModalOpen] = useState(false);
     const srcInputRef = useRef<HTMLInputElement>(null);
 
-    const {addNotification} = useContext(NotificationsContext);
+    const addNotification = useNotifications();
 
     const handleInsertImage = async () => {
         const file = handleClose();
