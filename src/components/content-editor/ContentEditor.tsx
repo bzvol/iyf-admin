@@ -1,6 +1,6 @@
 import './styles/ContentEditor.scss';
 import './styles/theme.scss';
-import {LexicalComposer} from '@lexical/react/LexicalComposer';
+import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
@@ -27,6 +27,10 @@ interface ContentEditorProps {
     namespace?: string;
     submitLabel?: string;
     onSubmit: (state: ContentEditorState) => void;
+    state?: {
+        title: string;
+        content: string;
+    }
     before?: React.ReactNode;
     after?: React.ReactNode;
 }
@@ -34,16 +38,17 @@ interface ContentEditorProps {
 export default function ContentEditor({
                                           namespace = 'Editor',
                                           submitLabel = 'Submit', onSubmit,
-                                          before, after
+                                          state, before, after
                                       }: ContentEditorProps) {
     const titleRef = useRef<HTMLInputElement>(null);
     const editorStateRef = useRef<EditorState | null>(null);
 
-    const initialConfig = {
+    const initialConfig: InitialConfigType  = {
         namespace,
         theme,
         onError: console.error,
         nodes: [HeadingNode, LinkNode, ListItemNode, ListNode, ImageNode],
+        editorState: state?.content
     }
 
     const handleSubmit = () => {
@@ -71,7 +76,7 @@ export default function ContentEditor({
         <div className="ContentEditor">
             <input className="ContentEditor__title" ref={titleRef}
                    type="text" id="editor-title" name="title"
-                   placeholder="Title..." required/>
+                   placeholder="Title..." defaultValue={state?.title} required/>
             {before}
             <div className="ContentEditor__editor-wrapper">
                 <LexicalComposer initialConfig={initialConfig}>

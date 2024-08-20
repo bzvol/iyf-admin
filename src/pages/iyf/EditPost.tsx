@@ -1,14 +1,16 @@
-import './styles/CreatePost.scss';
-import ContentEditor, {ContentEditorState} from "../../components/content-editor/ContentEditor";
-import {Link, useNavigate} from "react-router-dom";
-import {ArrowBack} from "@mui/icons-material";
-import apiUrls, {apiClient} from "../../api";
+import './styles/EditPost.scss';
 import React, {useState} from "react";
-import Tags from "../../components/content-editor/Tags";
 import {useNotifications} from "../../utils";
+import {Link, useLocation, useNavigate} from "react-router-dom";
+import ContentEditor, {ContentEditorState} from "../../components/content-editor/ContentEditor";
+import apiUrls, {apiClient, Post} from "../../api";
+import {ArrowBack} from "@mui/icons-material";
+import Tags from "../../components/content-editor/Tags";
 
-export default function CreatePost() {
-    const [tags, setTags] = useState<string[]>([]);
+export default function EditPost() {
+    const {state: post} = useLocation() as {state: Post};
+
+    const [tags, setTags] = useState<string[]>(post.tags);
 
     const withNoti = useNotifications();
     const navigate = useNavigate();
@@ -17,11 +19,11 @@ export default function CreatePost() {
         withNoti({
             type: 'loading',
             messages: {
-                loading: 'Creating post...',
-                success: 'Post created successfully.',
-                error: 'Failed to create post.'
+                loading: 'Submitting post edit...',
+                success: 'Post edit submitted successfully',
+                error: 'Failed to submit post edit'
             },
-            action: async () => apiClient.post(apiUrls.posts.create, {...state, tags}),
+            action: async () => apiClient.put(apiUrls.posts.update(post.id), {...state, tags}),
             onSuccess: () => navigate('/iyf/posts')
         });
     };
@@ -33,6 +35,7 @@ export default function CreatePost() {
             </Link>
             <ContentEditor
                 onSubmit={handleSubmit}
+                state={post}
                 after={<Tags tags={tags} setTags={setTags}/>}
             />
         </div>

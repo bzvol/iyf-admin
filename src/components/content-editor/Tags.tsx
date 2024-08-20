@@ -7,7 +7,7 @@ interface TagsProps {
     setTags: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export function Tags({tags, setTags}: TagsProps) {
+export default function Tags({tags, setTags}: TagsProps) {
     const handleAdd = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key !== 'Enter' || !event.currentTarget.value) return;
         let newTags = event.currentTarget.value.trim().split(/\s*,|;\s*/);
