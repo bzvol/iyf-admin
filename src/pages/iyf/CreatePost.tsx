@@ -13,8 +13,7 @@ export default function CreatePost() {
     const withNoti = useNotifications();
     const navigate = useNavigate();
 
-    const handleSubmit = (state: ContentEditorState) => {
-        withNoti({
+    const handleSubmit = (state: ContentEditorState) => withNoti({
             type: 'loading',
             messages: {
                 loading: 'Creating post...',
@@ -24,7 +23,6 @@ export default function CreatePost() {
             action: async () => apiClient.post(apiUrls.posts.create, {...state, tags}),
             onSuccess: () => navigate('/iyf/posts')
         });
-    };
 
     return (
         <div className="CreatePost">

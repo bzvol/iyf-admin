@@ -1,3 +1,5 @@
+@import '../../variables';
+
 .SearchBar {
   width: min(100%, 400px);
   border-radius: .5rem;
@@ -9,6 +11,7 @@
     all: unset;
     width: 100%;
     font-size: 1.2rem;
+
     &:focus-within {
       border: none;
     }
@@ -35,6 +38,7 @@
 
 @media (prefers-color-scheme: dark) {
   .SearchBar {
-   background: ghostwhite;
+    background: $color-secondary;
+    color: white;
   }
 }

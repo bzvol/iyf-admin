@@ -15,8 +15,7 @@ export default function EditPost() {
     const withNoti = useNotifications();
     const navigate = useNavigate();
 
-    const handleSubmit = (state: ContentEditorState) => {
-        withNoti({
+    const handleSubmit = (state: ContentEditorState) => withNoti({
             type: 'loading',
             messages: {
                 loading: 'Submitting post edit...',
@@ -26,7 +25,6 @@ export default function EditPost() {
             action: async () => apiClient.put(apiUrls.posts.update(post.id), {...state, tags}),
             onSuccess: () => navigate('/iyf/posts')
         });
-    };
 
     return (
         <div className="CreatePost">

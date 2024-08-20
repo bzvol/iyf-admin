@@ -61,7 +61,15 @@
 @media (prefers-color-scheme: dark) {
   .ContentEditor {
     &__title-wrapper, &__editor-wrapper {
+      background: #555;
+    }
+
+    &__editor-wrapper2 {
       background: $color-secondary;
+    }
+
+    &__editor {
+      color: white;
     }
   }
 }

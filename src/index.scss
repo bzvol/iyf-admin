@@ -171,4 +171,9 @@ code {
       background-color: #8da6b2;
     }
   }
+
+  input[type="text"], input[type="password"], input[type="email"], input[type="number"], textarea {
+    background: $color-secondary;
+    color: white;
+  }
 }
