@@ -3,10 +3,13 @@ import ContentEditor, {ContentEditorState} from "../../components/content-editor
 import {Link, useNavigate} from "react-router-dom";
 import {ArrowBack} from "@mui/icons-material";
 import apiUrls, {apiClient} from "../../api";
-import {useContext} from "react";
+import React, {useContext, useState} from "react";
 import {NotificationsContext} from "../../components/sidebar/Notifications";
+import {Tags} from "../../components/content-editor/Tags";
 
 export default function CreatePost() {
+    const [tags, setTags] = useState<string[]>([]);
+
     const {addNotification: withNoti} = useContext(NotificationsContext);
     const navigate = useNavigate();
 
@@ -18,7 +21,7 @@ export default function CreatePost() {
                 success: 'Post created successfully.',
                 error: 'Failed to create post.'
             },
-            action: async () => apiClient.post(apiUrls.posts.create, {...state, tags: []}),
+            action: async () => apiClient.post(apiUrls.posts.create, {...state, tags}),
             onSuccess: () => navigate('/iyf/posts')
         });
     };
@@ -28,7 +31,10 @@ export default function CreatePost() {
             <Link to="/iyf/posts">
                 <button className="icon-n-text"><ArrowBack/> Back to posts</button>
             </Link>
-            <ContentEditor onSubmit={handleSubmit}/>
+            <ContentEditor
+                onSubmit={handleSubmit}
+                after={<Tags tags={tags} setTags={setTags}/>}
+            />
         </div>
     );
 }

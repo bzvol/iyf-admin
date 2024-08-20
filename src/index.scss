@@ -62,6 +62,14 @@ button:hover {
   background-color: #555;
 }
 
+input[type="text"], input[type="password"], input[type="email"], input[type="number"], textarea {
+  font-size: 1.2rem;
+  background: white;
+  color: black;
+  border-radius: .5rem;
+  padding: .5rem;
+}
+
 input[type="checkbox"].switch {
   display: none;
 
@@ -136,6 +144,16 @@ code {
 @media screen and (min-height: $breakpoint-lg) {
   html, body {
     height: max(100vh, 100%);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  input[type="text"], input[type="password"], input[type="email"], input[type="number"], textarea {
+    border: 1px solid #000;
+
+    &:focus-within {
+      border: 2px solid #000;
+    }
   }
 }
 

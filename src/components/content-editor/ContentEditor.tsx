@@ -27,9 +27,15 @@ interface ContentEditorProps {
     namespace?: string;
     submitLabel?: string;
     onSubmit: (state: ContentEditorState) => void;
+    before?: React.ReactNode;
+    after?: React.ReactNode;
 }
 
-export default function ContentEditor({namespace = 'Editor', submitLabel = 'Submit', onSubmit}: ContentEditorProps) {
+export default function ContentEditor({
+                                          namespace = 'Editor',
+                                          submitLabel = 'Submit', onSubmit,
+                                          before, after
+                                      }: ContentEditorProps) {
     const titleRef = useRef<HTMLInputElement>(null);
     const editorStateRef = useRef<EditorState | null>(null);
 
@@ -66,6 +72,7 @@ export default function ContentEditor({namespace = 'Editor', submitLabel = 'Subm
             <input className="ContentEditor__title" ref={titleRef}
                    type="text" id="editor-title" name="title"
                    placeholder="Title..." required/>
+            {before}
             <div className="ContentEditor__editor-wrapper">
                 <LexicalComposer initialConfig={initialConfig}>
                     <ToolbarPlugin/>
@@ -84,6 +91,7 @@ export default function ContentEditor({namespace = 'Editor', submitLabel = 'Subm
                     <OnChangePlugin onChange={editorState => editorStateRef.current = editorState}/>
                 </LexicalComposer>
             </div>
+            {after}
             <button className="ContentEditor__submit" onClick={handleSubmit}>{submitLabel}</button>
         </div>
     );

@@ -1,0 +1,61 @@
+@import '../../../variables';
+@import '../../../mixins';
+
+.ContentEditor {
+  &__tags-wrapper {
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+  }
+
+  &__tags {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    & > div {
+      @include icon-n-text;
+      display: inline-flex;
+      padding: .35rem .5rem;
+      background: $color-wrapper-bg;
+      border-radius: .5rem;
+      color: white;
+      font-size: 1.2rem;
+
+      & > svg {
+        cursor: pointer;
+      }
+    }
+  }
+
+  &__tag-input-wrapper {
+    display: inline-flex;
+    gap: .25rem;
+    background: $color-wrapper-bg;
+    border-radius: .5rem;
+    align-items: center;
+    padding-left: .25rem;
+
+    & > svg {
+      color: white;
+    }
+  }
+
+  #tag-input {
+    flex-grow: 1;
+  }
+}
+
+@media screen and (min-width: $breakpoint-lg) {
+  .ContentEditor {
+    &__tags {
+      justify-content: flex-start;
+    }
+
+    &__tag-input-wrapper {
+      width: 40%;
+      align-self: flex-start;
+    }
+  }
+}
