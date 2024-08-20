@@ -99,6 +99,8 @@ interface PostItemProps {
     showOptions: boolean;
 }
 
+const MAX_TAGS_SHOWN = 5;
+
 function PostItem({post, showOptions}: PostItemProps) {
     const plainText = useMemo(() => convertLexToPlain(post.content), [post.content])
 
@@ -184,6 +186,17 @@ function PostItem({post, showOptions}: PostItemProps) {
 
             <h2>{post.title}</h2>
             <p>{plainText}</p>
+
+            <div className="PostItem__tags">
+                {post.tags.map((tag, tagIdx) => {
+                    if (tagIdx < MAX_TAGS_SHOWN) return <span key={tag} className="PostItem__tag">{tag}</span>;
+                    if (tagIdx === MAX_TAGS_SHOWN) { // This also means there are more tags
+                        const moreTags = post.tags.length - MAX_TAGS_SHOWN;
+                        return <span key="more-tags" className="PostItem__tag"><i>+{moreTags} more</i></span>;
+                    }
+                    return null;
+                })}
+            </div>
 
             <ConfirmationModal
                 isOpen={deleteConfOpen}

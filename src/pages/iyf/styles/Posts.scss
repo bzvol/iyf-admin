@@ -1,0 +1,16 @@
+@import '../../../variables';
+
+.PostItem__tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  gap: .5rem;
+
+  & > span {
+    padding: .25rem .5rem;
+    background: $color-secondary-light;
+    border: 1px solid $color-secondary;
+    border-radius: .5rem;
+    color: $color-secondary;
+  }
+}

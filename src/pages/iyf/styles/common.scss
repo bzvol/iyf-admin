@@ -24,6 +24,8 @@
 }
 
 .schgrid__item {
+  display: flex;
+  flex-direction: column;
   background: $color-secondary-light;
   padding: 1.5rem;
   border-radius: .5rem;
