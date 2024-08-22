@@ -27,7 +27,7 @@ export default function EditPost() {
         });
 
     return (
-        <div className="CreatePost">
+        <div className="EditPost">
             <Link to="/iyf/posts">
                 <button className="icon-n-text"><ArrowBack/> Back to posts</button>
             </Link>

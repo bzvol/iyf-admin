@@ -48,7 +48,7 @@ export function EditEvent() {
     });
 
     return (
-        <div className="CreateEvent">
+        <div className="EditEvent">
             <Link to="/iyf/events">
                 <button className="icon-n-text"><ArrowBack/> Back to events</button>
             </Link>

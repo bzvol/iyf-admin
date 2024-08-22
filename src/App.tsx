@@ -9,6 +9,9 @@ import CreatePost from "./pages/iyf/CreatePost";
 import EditPost from "./pages/iyf/EditPost";
 import CreateEvent from "./pages/iyf/CreateEvent";
 import {EditEvent} from "./pages/iyf/EditEvent";
+import RegularEvents from "./pages/iyf/RegularEvents";
+import CreateRegularEvent from "./pages/iyf/CreateRegularEvent";
+import EditRegularEvent from "./pages/iyf/EditRegularEvent";
 
 export default function App() {
     useEffect(() => {
@@ -59,7 +62,15 @@ export default function App() {
                         },
                         {
                             path: "/iyf/regular",
-                            element: <h1>Regular Events</h1>
+                            element: <RegularEvents/>
+                        },
+                        {
+                            path: "/iyf/regular/create",
+                            element: <CreateRegularEvent/>
+                        },
+                        {
+                            path: "/iyf/regular/:id/edit",
+                            element: <EditRegularEvent/>
                         }
                     ]
                 },

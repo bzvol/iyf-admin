@@ -177,6 +177,10 @@
       &-menu {
         background: $color-secondary;
         border: 2px solid $color-primary;
+
+        & > li > div {
+          background: #fff;
+        }
       }
     }
   }
