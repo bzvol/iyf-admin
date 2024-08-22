@@ -3,7 +3,15 @@ import './styles/common.scss';
 import apiUrls, {apiClient, Event, Status} from "../../api";
 import {useEffect, useMemo, useState} from "react";
 import {useAuth} from "../../firebase";
-import {Add, Delete, Edit, MoreVert} from "@mui/icons-material";
+import {
+    AccessTimeFilled as StartTime,
+    Add,
+    Delete,
+    Edit,
+    LocationOn,
+    MoreVert,
+    Update as EndTime
+} from "@mui/icons-material";
 import {capitalize, getFirstName, getMetadataTitle, StatusAction, StatusIcon} from './common';
 import SearchBar from '../../components/SearchBar';
 import ViewOnlyAlert from "../../components/ViewOnlyAlert";
@@ -101,6 +109,7 @@ interface EventItemProps {
 
 function EventItem({event, showOptions}: EventItemProps) {
     const plainText = useMemo(() => convertLexToPlain(event.details), [event.details])
+    const showSchedule = event.schedule.location || event.schedule.startTime || event.schedule.endTime;
 
     const [deleteConfOpen, setDeleteConfOpen] = useState(false);
     const [statusActionConfOpen, setStatusActionConfOpen] = useState(false);
@@ -185,6 +194,16 @@ function EventItem({event, showOptions}: EventItemProps) {
             <h2>{event.title}</h2>
             <p>{plainText}</p>
 
+            {showSchedule &&
+                <div className="EventItem__schedule">
+                    {event.schedule.location &&
+                        <div className="icon-n-text"><LocationOn/> {event.schedule.location}</div>}
+                    {event.schedule.startTime &&
+                        <div className="icon-n-text"><StartTime/> {parseISO(event.schedule.startTime)}</div>}
+                    {event.schedule.endTime &&
+                        <div className="icon-n-text"><EndTime/> {parseISO(event.schedule.endTime)}</div>}
+                </div>}
+
             <ConfirmationModal
                 isOpen={deleteConfOpen}
                 onClose={() => setDeleteConfOpen(false)}
@@ -198,7 +217,7 @@ function EventItem({event, showOptions}: EventItemProps) {
             </ConfirmationModal>
             <ConfirmationModal
                 isOpen={statusActionConfOpen}
-                onClose={() => setStatusActionConfOpen(true)}
+                onClose={() => setStatusActionConfOpen(false)}
                 onConfirm={() => {
                     setStatusActionConfOpen(false);
                     handleStatusAction()
@@ -209,4 +228,17 @@ function EventItem({event, showOptions}: EventItemProps) {
             </ConfirmationModal>
         </article>
     );
+}
+
+const localeOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric', month: 'short', day: 'numeric',
+    hour: 'numeric', minute: '2-digit'
+};
+
+function parseISO(date: string) {
+    const [datePart, timePart] = date.split("T");
+    const [year, month, day] = datePart.split("-");
+    const [hour, minute] = timePart.split(":");
+    const parsed = new Date(+year, +month - 1, +day, +hour, +minute);
+    return parsed.toLocaleString('en-GB', localeOptions);
 }
