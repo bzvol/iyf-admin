@@ -1,0 +1,18 @@
+.ContentEditor__time-icon-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  width: 40px;
+
+  & > svg {
+    font-size: 1.5em;
+  }
+
+  & > span {
+    font-size: 0.7em;
+    text-align: center;
+    font-weight: bold;
+  }
+}

@@ -47,6 +47,16 @@
     color: #999;
     z-index: 0;
   }
+
+  &__schedule {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    & > div {
+      flex: 1 1 0;
+    }
+  }
 }
 
 @media (prefers-color-scheme: light) {
@@ -64,6 +74,10 @@
       background: #555;
     }
 
+    &__title:focus-within, &__editor:focus-within {
+      border: 2px solid $color-primary-light;
+    }
+
     &__editor-wrapper2 {
       background: $color-secondary;
     }
@@ -71,5 +85,11 @@
     &__editor {
       color: white;
     }
+  }
+}
+
+@media screen and (min-width: $breakpoint-md) {
+  .ContentEditor__schedule {
+    flex-direction: row;
   }
 }

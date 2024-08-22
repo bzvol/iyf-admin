@@ -1,8 +1,29 @@
+@import 'variables';
+
 @mixin icon-n-text {
   display: flex;
   align-items: center;
   gap: .35rem;
   & > svg {
     font-size: 1.2em;
+  }
+}
+
+@mixin icon-n-field {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  padding-left: .25rem;
+  background: $color-wrapper-bg;
+  border-radius: .5rem;
+
+  & > svg {
+    color: white;
+    font-size: 1.2em;
+  }
+
+  & > input {
+    width: 100%;
+    height: 100%;
   }
 }
