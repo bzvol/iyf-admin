@@ -8,6 +8,7 @@ import IAM from "./pages/IAM";
 import CreatePost from "./pages/iyf/CreatePost";
 import EditPost from "./pages/iyf/EditPost";
 import CreateEvent from "./pages/iyf/CreateEvent";
+import {EditEvent} from "./pages/iyf/EditEvent";
 
 export default function App() {
     useEffect(() => {
@@ -54,7 +55,7 @@ export default function App() {
                         },
                         {
                             path: "/iyf/events/:id/edit",
-                            element: <h1>Edit event</h1>
+                            element: <EditEvent/>
                         },
                         {
                             path: "/iyf/regular",
