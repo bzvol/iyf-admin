@@ -4,6 +4,7 @@ import "./styles/Notifications.scss";
 import {Delete} from "@mui/icons-material";
 
 export interface Notification {
+    id?: number;
     type: AlertType;
     message?: string;
     messages?: {
@@ -14,7 +15,7 @@ export interface Notification {
     action?: () => Promise<void>;
     onSuccess?: () => void;
     onError?: () => void;
-    timestamp?: number;
+    status?: "loading" | "success" | "error";
 }
 
 interface NotificationsContextProps {
@@ -40,16 +41,7 @@ export default function Notifications() {
                 <Delete onClick={handleClear}/>
             </div>
             <div className="Notifications-items">
-                {notifications.map(noti => noti.type === "loading" ? (
-                    <LoadingNotification key={`notification-${noti.timestamp}`}
-                                         messages={noti.messages!}
-                                         action={noti.action!} onSuccess={noti.onSuccess} onError={noti.onError}
-                    />
-                ) : (
-                    <Alert key={`notification-${noti.timestamp}`} type={noti.type}>
-                        {noti.message!}
-                    </Alert>
-                ))}
+                {notifications.map(noti => <NotificationItem key={noti.id!} notification={noti}/>)}
                 {!notifications.length && <i>No notifications</i>}
             </div>
         </div>
@@ -61,85 +53,35 @@ export function NotificationToasts() {
 
     return (
         <div className="NotificationToasts">
-            {notifications.slice(0, 3).map(noti => noti.type === "loading" ? (
-                <LoadingNotificationToast key={`sb-notification-${noti.timestamp}`}
-                                          action={noti.action!}
-                                          messages={noti.messages!}
-                />
-            ) : (
-                <Alert key={`sb-notification-${noti.timestamp}`} type={noti.type}>
-                    {noti.message!}
-                </Alert>
-            ))}
+            {notifications.slice(0, 3).map(noti =>
+                <NotificationToast key={`toast-${noti.id!}`} notification={noti}/>)}
         </div>
     );
 }
 
-interface LoadingNotificationProps {
-    messages: {
-        loading: string;
-        success: string;
-        error: string
-    };
-    action: () => Promise<void>;
-    onSuccess?: () => void;
-    onError?: () => void;
-}
-
-function LoadingNotification(props: LoadingNotificationProps) {
-    const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-
-    useEffect(() => {
-        (async () => {
-            try {
-                await props.action();
-                setStatus("success");
-                props.onSuccess?.();
-            } catch (e) {
-                setStatus("error");
-                props.onError?.();
-            }
-        })();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.action]);
-
+function NotificationItem({notification: noti}: { notification: Notification; }) {
     return (
-        <Alert type={status}>
-            {status === "loading" && props.messages.loading}
-            {status === "success" && props.messages.success}
-            {status === "error" && props.messages.error}
+        <Alert type={noti.type === "loading" ? noti.status! : noti.type}>
+            {noti.type !== "loading" ? noti.message! : <>
+                {noti.status === "loading" && noti.messages!.loading}
+                {noti.status === "success" && noti.messages!.success}
+                {noti.status === "error" && noti.messages!.error}
+            </>}
         </Alert>
     );
 }
 
-function LoadingNotificationToast(props: LoadingNotificationProps) {
-    const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+function NotificationToast({notification: noti}: { notification: Notification; }) {
     const [show, setShow] = useState(false);
-
     useEffect(() => {
         setTimeout(() => setShow(true), 0);
-        (async () => {
-            try {
-                await props.action();
-                setStatus("success");
-                props.onSuccess?.();
-            } catch (e) {
-                setStatus("error");
-                props.onError?.();
-            } finally {
-                setTimeout(() => setShow(false), 3000);
-            }
-        })();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.action]);
+        if (noti.status !== "loading")
+            setTimeout(() => setShow(false), 3000);
+    }, [noti.status]);
 
     return (
         <div className={`NotificationToast-wrapper${show ? " NotificationToast-show" : ""}`}>
-            <Alert type={status}>
-                {status === "loading" && props.messages.loading}
-                {status === "success" && props.messages.success}
-                {status === "error" && props.messages.error}
-            </Alert>
+            <NotificationItem notification={noti}/>
         </div>
     )
 }

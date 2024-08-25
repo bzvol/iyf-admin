@@ -6,12 +6,32 @@ import {ListItemNode, ListNode} from "@lexical/list";
 import {ImageNode} from "./components/content-editor/ImagePlugin";
 import {$getRoot, createEditor} from "lexical";
 
-export function useNotifications() {
+export function useNotifications(): (notification: Notification) => void {
     const {setNotifications} = useContext(NotificationsContext);
-    return useCallback((notification: Notification) => setNotifications(prev => [{
-        ...notification,
-        timestamp: Date.now()
-    }, ...prev]), [setNotifications]);
+
+    const asyncFunc = useCallback(async (noti: Notification) => {
+        const notiId = Date.now();
+        setNotifications(prev => [{
+            ...noti, id: notiId,
+            status: noti.type === "loading" ? "loading" : undefined
+        }, ...prev]);
+
+        if (noti.type !== "loading") return;
+
+        try {
+            await noti.action?.();
+            noti.onSuccess?.();
+            setNotifications(prev => prev.map(noti => noti.id === notiId
+                ? {...noti, status: "success"} : noti));
+        }
+        catch (e) {
+            noti.onError?.();
+            setNotifications(prev => prev.map(noti => noti.id === notiId
+                ? {...noti, status: "error"} : noti));
+        }
+    }, [setNotifications]);
+
+    return (notification: Notification) => asyncFunc(notification);
 }
 
 type Trigger = () => void;
