@@ -1,5 +1,5 @@
 import './App.scss';
-import {createBrowserRouter, RouterProvider, useRouteError} from "react-router-dom";
+import {createBrowserRouter, Link, RouterProvider, useRouteError} from "react-router-dom";
 import Root from "./pages/Root";
 import Posts from "./pages/iyf/Posts";
 import {useEffect} from "react";
@@ -87,12 +87,19 @@ function ErrorBoundary() {
     const error = useRouteError() as { status?: number };
 
     return (
-        <div style={{margin: "1rem", display: "inline-flex", flexDirection: "column", gap: "1rem"}}>
-            {(error.status && error.status === 404)
-                ? <h1>Page not found</h1>
-                : <h1>Something went wrong</h1>}
+        <div className="ErrorBoundary">
+            <div>
+                {(error.status && error.status === 404)
+                    ? <h1>Page not found</h1>
+                    : <div className="ErrorBoundary__error">
+                        <h1>Something went wrong</h1>
+                        <code>{JSON.stringify(error)}</code>
+                    </div>}
 
-            <button onClick={() => window.location.href = "/"}>Go back to home</button>
+                <Link to="/">
+                    <button>Go back to home</button>
+                </Link>
+            </div>
         </div>
     )
 }

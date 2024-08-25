@@ -1,10 +1,13 @@
+import './styles/Root.scss';
 import Sidebar from "../components/sidebar/Sidebar";
 import {Outlet, useLocation} from "react-router-dom";
 import {useMediaQuery} from "@mui/material";
-import {useAuth} from "../firebase";
+import {auth, provider, useAuth} from "../firebase";
 import {Home} from "./Home";
 import {useState} from "react";
 import {Notification, NotificationsContext, NotificationToasts} from "../components/sidebar/Notifications";
+import {signInWithPopup} from "firebase/auth";
+import {useNotifications} from "../utils";
 
 export default function Root() {
     const {loggedIn, admin} = useAuth();
@@ -33,10 +36,27 @@ export default function Root() {
 }
 
 function UnauthorizedScreen() {
+    const addNotification = useNotifications();
+
+    const handleSignIn = async () => {
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (error) {
+            addNotification({
+                type: "error",
+                message: "Failed to sign in",
+            });
+        }
+    }
+
     return (
-        <>
-            <h1>Unauthorized</h1>
-            <p>You are not authorized to view this page.</p>
-        </>
+        <div className="UnauthorizedScreen">
+            <div>
+                <h1>Unauthorized</h1>
+                <p>Please sign in to view IYF Admin. <i>Registering with a verified @iyf.hu account gives automatic
+                    access.</i></p>
+                <button onClick={handleSignIn}>Sign in</button>
+            </div>
+        </div>
     );
 }
