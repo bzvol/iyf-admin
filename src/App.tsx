@@ -34,10 +34,6 @@ export default function App() {
                     path: "/iyf",
                     children: [
                         {
-                            path: "/iyf/homepage",
-                            element: <h1>Homepage</h1>
-                        },
-                        {
                             path: "/iyf/posts",
                             element: <Posts/>,
                         },

@@ -10,18 +10,16 @@ export default function NavMenu() {
                 <li>
                     <span className="no-select">IYF <b>&gt;</b></span>
                     <ul>
-                        <li><NavLink to="/iyf/homepage">Carousel & layout</NavLink></li>
                         <li><NavLink to="/iyf/posts">Posts</NavLink></li>
                         <li><NavLink to="/iyf/events">Events</NavLink></li>
                         <li><NavLink to="/iyf/regular">Regular events</NavLink></li>
                     </ul>
                 </li>
                 <li>
-                    <span className="no-select">JHM <b>&gt;</b></span>
-                    <ul>
-                        <li><NavLink to="/jhm/posts">Posts</NavLink></li>
-                        <li><NavLink to="/jhm/events">Events</NavLink></li>
-                    </ul>
+                    <span className="no-select">
+                        <span style={{color: 'red', textDecoration: 'line-through'}}>JHM <b>&gt;</b></span>
+                        <i> not yet available</i>
+                    </span>
                 </li>
             </ul>
         </nav>
