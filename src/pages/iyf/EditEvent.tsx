@@ -1,7 +1,7 @@
 import './styles/EditEvent.scss';
 import React, {useEffect, useRef} from "react";
 import StartEndTimeFields, {StartEndTimeRefs} from "../../components/content-editor/StartEndTimeFields";
-import {useNotifications} from "../../utils";
+import {parseISO, useNotifications} from "../../utils";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import ContentEditor, {ContentEditorState} from "../../components/content-editor/ContentEditor";
 import apiUrls, {apiClient, Event} from "../../api";
@@ -52,6 +52,10 @@ export function EditEvent() {
             <Link to="/iyf/events">
                 <button className="icon-n-text"><ArrowBack/> Back to events</button>
             </Link>
+            <div>
+                <p>Created at {parseISO(event.metadata.createdAt)} (UTC) by {event.metadata.createdBy.displayName}</p>
+                <p>Last updated at {parseISO(event.metadata.updatedAt)} (UTC) by {event.metadata.updatedBy.displayName}</p>
+            </div>
             <ContentEditor
                 onSubmit={handleSubmit}
                 state={{title: event.title, content: event.details}}

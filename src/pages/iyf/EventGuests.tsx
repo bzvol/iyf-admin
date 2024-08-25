@@ -34,7 +34,6 @@ export default function EventGuests() {
                     type: "error",
                     message: "Failed to load guests",
                 });
-                console.error(e);
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,6 +66,7 @@ export default function EventGuests() {
                             <th>Where from</th>
                             <th>Heard from</th>
                             <th>Custom fields</th>
+                            <th>Registered at</th>
                             <th>Actions</th>
                         </tr>
                         </thead>}
@@ -112,6 +112,7 @@ function GuestItem({guest, eventId, xlScreen}: GuestItemProps) {
             <td>{guest.city || <b>---</b>}</td>
             <td>{guest.source || <b>---</b>}</td>
             <GuestCustomFields fields={customFields}/>
+            <td>{parseISO(guest.createdAt)} (UTC)</td>
             <GuestActions guest={guest} eventId={eventId}/>
         </tr>)
         : (<>
@@ -142,6 +143,10 @@ function GuestItem({guest, eventId, xlScreen}: GuestItemProps) {
             <tr>
                 <td>Custom fields</td>
                 <GuestCustomFields fields={customFields}/>
+            </tr>
+            <tr>
+                <td>Registered at</td>
+                <td>{parseISO(guest.createdAt)} (UTC)</td>
             </tr>
             <tr>
                 <td>Actions</td>

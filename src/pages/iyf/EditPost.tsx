@@ -1,6 +1,6 @@
 import './styles/EditPost.scss';
 import React, {useState} from "react";
-import {useNotifications} from "../../utils";
+import {parseISO, useNotifications} from "../../utils";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import ContentEditor, {ContentEditorState} from "../../components/content-editor/ContentEditor";
 import apiUrls, {apiClient, Post} from "../../api";
@@ -31,6 +31,10 @@ export default function EditPost() {
             <Link to="/iyf/posts">
                 <button className="icon-n-text"><ArrowBack/> Back to posts</button>
             </Link>
+            <div>
+                <p>Created at {parseISO(post.metadata.createdAt)} (UTC) by {post.metadata.createdBy.displayName}</p>
+                <p>Last updated at {parseISO(post.metadata.updatedAt)} (UTC) by {post.metadata.updatedBy.displayName}</p>
+            </div>
             <ContentEditor
                 onSubmit={handleSubmit}
                 state={post}

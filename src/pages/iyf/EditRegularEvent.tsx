@@ -2,7 +2,7 @@ import './styles/EditRegularEvent.scss';
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import apiUrls, {apiClient, RegularEvent} from "../../api";
 import React, {useEffect, useRef} from "react";
-import {useNotifications} from "../../utils";
+import {parseISO, useNotifications} from "../../utils";
 import ContentEditor, {ContentEditorState} from "../../components/content-editor/ContentEditor";
 import {ArrowBack} from "@mui/icons-material";
 import LocationField from "../../components/content-editor/LocationField";
@@ -48,6 +48,10 @@ export default function EditRegularEvent() {
             <Link to="/iyf/regular">
                 <button className="icon-n-text"><ArrowBack/> Back to regular events</button>
             </Link>
+            <div>
+                <p>Created at {parseISO(event.metadata.createdAt)} (UTC) by {event.metadata.createdBy.displayName}</p>
+                <p>Last updated at {parseISO(event.metadata.updatedAt)} (UTC) by {event.metadata.updatedBy.displayName}</p>
+            </div>
             <ContentEditor
                 onSubmit={handleSubmit}
                 state={{title: event.title, content: event.details}}
