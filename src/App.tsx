@@ -14,71 +14,73 @@ import CreateRegularEvent from "./pages/iyf/CreateRegularEvent";
 import EditRegularEvent from "./pages/iyf/EditRegularEvent";
 import EventGuests from "./pages/iyf/EventGuests";
 
+export const routes = [
+    {
+        path: "/",
+        element: <Root/>,
+        children: [
+            {
+                path: "/iam",
+                element: <IAM/>
+            },
+            {
+                path: "/iyf",
+                children: [
+                    {
+                        path: "/iyf/posts",
+                        element: <Posts/>,
+                    },
+                    {
+                        path: "/iyf/posts/create",
+                        element: <CreatePost/>
+                    },
+                    {
+                        path: "/iyf/posts/:id/edit",
+                        element: <EditPost/>
+                    },
+                    {
+                        path: "/iyf/events",
+                        element: <Events/>
+                    },
+                    {
+                        path: "/iyf/events/create",
+                        element: <CreateEvent/>
+                    },
+                    {
+                        path: "/iyf/events/:id/edit",
+                        element: <EditEvent/>
+                    },
+                    {
+                        path: "/iyf/events/:id/guests",
+                        element: <EventGuests/>
+                    },
+                    {
+                        path: "/iyf/regular",
+                        element: <RegularEvents/>
+                    },
+                    {
+                        path: "/iyf/regular/create",
+                        element: <CreateRegularEvent/>
+                    },
+                    {
+                        path: "/iyf/regular/:id/edit",
+                        element: <EditRegularEvent/>
+                    }
+                ]
+            },
+        ],
+        errorElement: <ErrorBoundary/>
+    }
+];
+
+const router = createBrowserRouter(routes);
+
 export default function App() {
     useEffect(() => {
         setPerfectHeight();
         window.addEventListener('resize', setPerfectHeight);
         return () => window.removeEventListener('resize', setPerfectHeight);
     }, []);
-
-    const router = createBrowserRouter([
-        {
-            path: "/",
-            element: <Root/>,
-            children: [
-                {
-                    path: "/iam",
-                    element: <IAM/>
-                },
-                {
-                    path: "/iyf",
-                    children: [
-                        {
-                            path: "/iyf/posts",
-                            element: <Posts/>,
-                        },
-                        {
-                            path: "/iyf/posts/create",
-                            element: <CreatePost/>
-                        },
-                        {
-                            path: "/iyf/posts/:id/edit",
-                            element: <EditPost/>
-                        },
-                        {
-                            path: "/iyf/events",
-                            element: <Events/>
-                        },
-                        {
-                            path: "/iyf/events/create",
-                            element: <CreateEvent/>
-                        },
-                        {
-                            path: "/iyf/events/:id/edit",
-                            element: <EditEvent/>
-                        },
-                        {
-                            path: "/iyf/events/:id/guests",
-                            element: <EventGuests/>
-                        },
-                        {
-                            path: "/iyf/regular",
-                            element: <RegularEvents/>
-                        },
-                        {
-                            path: "/iyf/regular/create",
-                            element: <CreateRegularEvent/>
-                        },
-                        {
-                            path: "/iyf/regular/:id/edit",
-                            element: <EditRegularEvent/>
-                        }
-                    ]
-                },
-            ],
-            errorElement: <ErrorBoundary/>
-        }
-    ]);
 
     return <RouterProvider router={router}/>;
 }

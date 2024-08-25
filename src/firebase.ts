@@ -2,6 +2,7 @@ import {initializeApp} from "firebase/app";
 import {getAuth, GoogleAuthProvider, User, setPersistence, browserSessionPersistence} from "firebase/auth";
 import {useEffect, useState} from "react";
 import apiUrls, {apiClient} from "./api";
+import Bugsnag from "@bugsnag/js";
 
 const authDomain = !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ?
     "iyfhu-caaf9.firebaseapp.com" : "admin.iyf.hu";
@@ -73,7 +74,7 @@ export function useAuth(): IAuth {
                 token = await user.getIdTokenResult(true);
                 claims = token.claims;
             } catch (err) {
-                console.error(`Error while setting default claims:`, err);
+                if (err instanceof Error) Bugsnag.notify(err);
             }
 
             setAuthState((prev) => ({

@@ -4,6 +4,10 @@
   "private": false,
   "license": "GPL-3.0",
   "dependencies": {
+    "@bugsnag/browser-performance": "^2.8.0",
+    "@bugsnag/js": "^7.25.0",
+    "@bugsnag/plugin-react": "^7.25.0",
+    "@bugsnag/react-router-performance": "^2.7.1",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@lexical/html": "^0.16.1",

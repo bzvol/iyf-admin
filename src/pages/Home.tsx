@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {useAuth} from "../firebase";
 import Alert from "../components/Alert";
 import {useNotifications} from "../utils";
+import Bugsnag from "@bugsnag/js";
 
 export function Home() {
     const [countInfo, setContentInfo] = useState<CountInfo>({
@@ -29,6 +30,7 @@ export function Home() {
                     type: "error",
                     message: "Failed to fetch counts"
                 });
+                if (e instanceof Error) Bugsnag.notify(e);
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps

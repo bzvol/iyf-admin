@@ -4,6 +4,7 @@ import {AccessRequestModal} from "./AccessRequestModal";
 import {signInWithPopup} from "firebase/auth";
 import "./styles/Profile.scss";
 import UserPhoto from "../UserPhoto";
+import Bugsnag from "@bugsnag/js";
 
 export function Profile() {
     const {user, loading, loggedIn, accessRequested, admin, roles} = useAuth();
@@ -38,8 +39,8 @@ export function Profile() {
 }
 
 function changeAuthState() {
-    if (auth.currentUser) auth.signOut().catch(console.error);
-    else signInWithPopup(auth, provider).catch(console.error);
+    if (auth.currentUser) auth.signOut().catch(err => {if (err instanceof Error) Bugsnag.notify(err)});
+    else signInWithPopup(auth, provider).catch(err => {if (err instanceof Error) Bugsnag.notify(err)});
 }
 
 function Roles({roles}: { roles: IRoles }) {

@@ -12,6 +12,7 @@ import Alert from "../../components/Alert";
 import {Link, useNavigate} from "react-router-dom";
 import {convertLexToPlain, createTriggerContext, useCreateTrigger, useNotifications, useTrigger} from "../../utils";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import Bugsnag from "@bugsnag/js";
 
 const PostsTrigger = createTriggerContext();
 
@@ -38,6 +39,7 @@ export default function Posts() {
                     type: "error",
                     message: "Failed to load posts"
                 });
+                if (e instanceof Error) Bugsnag.notify(e);
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps

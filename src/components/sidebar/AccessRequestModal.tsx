@@ -3,6 +3,7 @@ import {User} from "firebase/auth";
 import Modal from "../Modal";
 import apiUrls, {apiClient} from "../../api";
 import "./styles/AccessRequestModal.scss";
+import Bugsnag from "@bugsnag/js";
 
 interface AccessRequestModalOptions {
     btnText: string,
@@ -86,6 +87,6 @@ function handleSubmit(setModalOptions: React.Dispatch<React.SetStateAction<Acces
             errorMessage: errorMessage,
         }));
 
-        console.error("Error while sending access request: ", err.response ?? err);
+        if (err instanceof Error) Bugsnag.notify(err);
     });
 }

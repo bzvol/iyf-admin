@@ -27,6 +27,7 @@ import {
 } from "../../utils";
 import {Link, useNavigate} from "react-router-dom";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import Bugsnag from "@bugsnag/js";
 
 const EventsTrigger = createTriggerContext();
 
@@ -53,6 +54,7 @@ export default function Events() {
                     type: "error",
                     message: "Failed to load events"
                 });
+                if (e instanceof Error) Bugsnag.notify(e);
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps

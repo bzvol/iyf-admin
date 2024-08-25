@@ -5,6 +5,7 @@ import {LinkNode} from "@lexical/link";
 import {ListItemNode, ListNode} from "@lexical/list";
 import {ImageNode} from "./components/content-editor/ImagePlugin";
 import {$getRoot, createEditor} from "lexical";
+import Bugsnag from "@bugsnag/js";
 
 export function useNotifications(): (notification: Notification) => void {
     const {setNotifications} = useContext(NotificationsContext);
@@ -26,6 +27,7 @@ export function useNotifications(): (notification: Notification) => void {
         }
         catch (e) {
             noti.onError?.();
+            if (e instanceof Error) Bugsnag.notify(e);
             setNotifications(prev => prev.map(noti => noti.id === notiId
                 ? {...noti, status: "error"} : noti));
         }

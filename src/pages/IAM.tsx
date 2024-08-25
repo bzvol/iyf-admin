@@ -8,6 +8,7 @@ import apiUrls, {apiClient} from "../api";
 import Alert from "../components/Alert";
 import ConfirmationModal from "../components/ConfirmationModal";
 import {createTriggerContext, useCreateTrigger, useNotifications, useTrigger} from "../utils";
+import Bugsnag from "@bugsnag/js";
 
 type UserWithClaims = User & { customClaims: UserClaims };
 type UserClaims = {
@@ -43,6 +44,7 @@ export default function IAM() {
                     type: "error",
                     message: "Failed to load users",
                 });
+                if (e instanceof Error) Bugsnag.notify(e);
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps

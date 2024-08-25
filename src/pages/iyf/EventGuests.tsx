@@ -8,6 +8,7 @@ import {ArrowBack, Delete, Edit} from "@mui/icons-material";
 import {useMediaQuery} from "@mui/material";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import Modal from "../../components/Modal";
+import Bugsnag from "@bugsnag/js";
 
 const GuestsTrigger = createTriggerContext();
 
@@ -34,6 +35,7 @@ export default function EventGuests() {
                     type: "error",
                     message: "Failed to load guests",
                 });
+                if (e instanceof Error) Bugsnag.notify(e);
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps

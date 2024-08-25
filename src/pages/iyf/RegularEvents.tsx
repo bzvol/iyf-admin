@@ -11,6 +11,7 @@ import Alert from "../../components/Alert";
 import {capitalize, getFirstName, getMetadataTitle, StatusAction, StatusIcon} from "./common";
 import UserPhoto from "../../components/UserPhoto";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import Bugsnag from "@bugsnag/js";
 
 const RegularEventsTrigger = createTriggerContext();
 
@@ -37,6 +38,7 @@ export default function RegularEvents() {
                     type: "error",
                     message: "Failed to load regular events"
                 });
+                if (e instanceof Error) Bugsnag.notify(e);
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps

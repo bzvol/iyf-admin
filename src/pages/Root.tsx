@@ -8,6 +8,7 @@ import {useState} from "react";
 import {Notification, NotificationsContext, NotificationToasts} from "../components/sidebar/Notifications";
 import {signInWithPopup} from "firebase/auth";
 import {useNotifications} from "../utils";
+import Bugsnag from "@bugsnag/js";
 
 export default function Root() {
     const {loggedIn, admin} = useAuth();
@@ -46,6 +47,7 @@ function UnauthorizedScreen() {
                 type: "error",
                 message: "Failed to sign in",
             });
+            if (error instanceof Error) Bugsnag.notify(error);
         }
     }
 
