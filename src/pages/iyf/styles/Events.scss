@@ -1,3 +1,23 @@
 .EventItem__schedule {
   margin-top: .5rem;
 }
+
+.schgrid__item__top-bar-el2 {
+  display: flex;
+  gap: .5rem;
+}
+
+.EventItem__guests-btn {
+  background: #c3c3c3;
+  padding: .35rem;
+  border-radius: .35rem;
+
+  display: flex;
+  align-items: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  .EventItem__guests-btn {
+    background: #6b6b6b;
+  }
+}

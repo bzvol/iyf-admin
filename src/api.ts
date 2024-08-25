@@ -135,3 +135,16 @@ export interface RegularEvent extends MetadataAttributes {
     }
     status: Status;
 }
+
+export interface EventGuest {
+    id: number;
+    eventId: number;
+    name?: string;
+    email?: string;
+    phone?: string;
+    age?: number;
+    city?: string;
+    source?: string;
+    createdAt: string;
+    custom: {[key: string]: string};
+}

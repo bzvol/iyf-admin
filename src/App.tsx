@@ -12,6 +12,7 @@ import {EditEvent} from "./pages/iyf/EditEvent";
 import RegularEvents from "./pages/iyf/RegularEvents";
 import CreateRegularEvent from "./pages/iyf/CreateRegularEvent";
 import EditRegularEvent from "./pages/iyf/EditRegularEvent";
+import EventGuests from "./pages/iyf/EventGuests";
 
 export default function App() {
     useEffect(() => {
@@ -59,6 +60,10 @@ export default function App() {
                         {
                             path: "/iyf/events/:id/edit",
                             element: <EditEvent/>
+                        },
+                        {
+                            path: "/iyf/events/:id/guests",
+                            element: <EventGuests/>
                         },
                         {
                             path: "/iyf/regular",

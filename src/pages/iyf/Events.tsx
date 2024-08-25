@@ -9,7 +9,7 @@ import {
     Delete,
     Edit,
     LocationOn,
-    MoreVert,
+    MoreVert, PeopleAlt,
     Update as EndTime
 } from "@mui/icons-material";
 import {capitalize, getFirstName, getMetadataTitle, StatusAction, StatusIcon} from './common';
@@ -17,7 +17,14 @@ import SearchBar from '../../components/SearchBar';
 import ViewOnlyAlert from "../../components/ViewOnlyAlert";
 import UserPhoto from "../../components/UserPhoto";
 import Alert from "../../components/Alert";
-import {convertLexToPlain, createTriggerContext, useCreateTrigger, useNotifications, useTrigger} from "../../utils";
+import {
+    convertLexToPlain,
+    createTriggerContext,
+    parseISO,
+    useCreateTrigger,
+    useNotifications,
+    useTrigger
+} from "../../utils";
 import {Link, useNavigate} from "react-router-dom";
 import ConfirmationModal from "../../components/ConfirmationModal";
 
@@ -94,7 +101,11 @@ export default function Events() {
             <EventsTrigger.Provider value={trigger}>
                 <div className="schgrid">
                     {filteredEvents.map((event) => (
-                        <EventItem key={"event" + event.id} event={event} showOptions={roles.contentManager}/>
+                        <EventItem
+                            key={"event" + event.id} event={event}
+                            showOptions={roles.contentManager}
+                            showGuests={roles.guestManager}
+                        />
                     ))}
                 </div>
             </EventsTrigger.Provider>
@@ -105,9 +116,10 @@ export default function Events() {
 interface EventItemProps {
     event: Event;
     showOptions: boolean;
+    showGuests: boolean;
 }
 
-function EventItem({event, showOptions}: EventItemProps) {
+function EventItem({event, showOptions, showGuests}: EventItemProps) {
     const plainText = useMemo(() => convertLexToPlain(event.details), [event.details])
     const showSchedule = event.schedule.location || event.schedule.startTime || event.schedule.endTime;
 
@@ -168,27 +180,31 @@ function EventItem({event, showOptions}: EventItemProps) {
                         )}
                     </div>
                 </div>
-                {showOptions && <div className="schgrid__item__options">
-                    <MoreVert/>
-                    <ul className="schgrid__item__options-menu">
-                        <li onClick={() => navigate(`/iyf/events/${event.id}/edit`, {state: event})}>
-                            <div/>
-                            <Edit/> Edit
-                            <div/>
-                        </li>
-                        {event.status === "draft" &&
-                            <li onClick={() => setDeleteConfOpen(true)}>
+                <div className="schgrid__item__top-bar-el2">
+                    {showGuests && <Link className="EventItem__guests-btn" title="View guests"
+                                         to={`/iyf/events/${event.id}/guests`} state={event}><PeopleAlt/></Link>}
+                    {showOptions && <div className="schgrid__item__options">
+                        <MoreVert/>
+                        <ul className="schgrid__item__options-menu">
+                            <li onClick={() => navigate(`/iyf/events/${event.id}/edit`, {state: event})}>
                                 <div/>
-                                <Delete/> Delete
+                                <Edit/> Edit
                                 <div/>
-                            </li>}
-                        <li onClick={() => setStatusActionConfOpen(true)}>
-                            <div/>
-                            <StatusAction status={event.status}/>
-                            <div/>
-                        </li>
-                    </ul>
-                </div>}
+                            </li>
+                            {event.status === "draft" &&
+                                <li onClick={() => setDeleteConfOpen(true)}>
+                                    <div/>
+                                    <Delete/> Delete
+                                    <div/>
+                                </li>}
+                            <li onClick={() => setStatusActionConfOpen(true)}>
+                                <div/>
+                                <StatusAction status={event.status}/>
+                                <div/>
+                            </li>
+                        </ul>
+                    </div>}
+                </div>
             </div>
 
             <h2>{event.title}</h2>
@@ -228,17 +244,4 @@ function EventItem({event, showOptions}: EventItemProps) {
             </ConfirmationModal>
         </article>
     );
-}
-
-const localeOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric', month: 'short', day: 'numeric',
-    hour: 'numeric', minute: '2-digit'
-};
-
-function parseISO(date: string) {
-    const [datePart, timePart] = date.split("T");
-    const [year, month, day] = datePart.split("-");
-    const [hour, minute] = timePart.split(":");
-    const parsed = new Date(+year, +month - 1, +day, +hour, +minute);
-    return parsed.toLocaleString('en-GB', localeOptions);
 }

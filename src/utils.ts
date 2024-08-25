@@ -45,3 +45,16 @@ export function convertLexToPlain(json: string) {
 
     return editorState.read(() => $getRoot().getTextContent());
 }
+
+const localeOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric', month: 'short', day: 'numeric',
+    hour: 'numeric', minute: '2-digit'
+};
+
+export function parseISO(date: string) {
+    const [datePart, timePart] = date.split("T");
+    const [year, month, day] = datePart.split("-");
+    const [hour, minute] = timePart.split(":");
+    const parsed = new Date(+year, +month - 1, +day, +hour, +minute);
+    return parsed.toLocaleString('en-GB', localeOptions);
+}

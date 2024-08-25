@@ -62,7 +62,7 @@ button:hover {
   background-color: #555;
 }
 
-input[type="text"], input[type="password"], input[type="email"], input[type="number"], input[type="datetime-local"], textarea {
+input[type="text"], input[type="password"], input[type="email"], input[type="tel"], input[type="number"], input[type="datetime-local"], textarea {
   font-size: 1.2rem;
   background: white;
   color: black;
@@ -152,7 +152,7 @@ code {
 }
 
 @media (prefers-color-scheme: light) {
-  input[type="text"], input[type="password"], input[type="email"], input[type="number"], input[type="datetime-local"], textarea {
+  input[type="text"], input[type="password"], input[type="email"], input[type="tel"], input[type="number"], input[type="datetime-local"], textarea {
     border: 1px solid #000;
 
     &:focus-within {
@@ -176,7 +176,7 @@ code {
     }
   }
 
-  input[type="text"], input[type="password"], input[type="email"], input[type="number"], input[type="datetime-local"], textarea {
+  input[type="text"], input[type="password"], input[type="email"], input[type="tel"], input[type="number"], input[type="datetime-local"], textarea {
     background: $color-secondary;
     color: white;
     //border: 1px solid $color-primary;
