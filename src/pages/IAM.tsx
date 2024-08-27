@@ -214,7 +214,7 @@ function StatusActionButton({user, action}: StatusActionButtonProps) {
         action: async () => {
             if (action === "grant" || action === "deny")
                 await apiClient.post(apiUrls.users.grantAccess(user.uid), {grantAccess: action === "grant"});
-            else if (action === "revoke") await apiClient.post(apiUrls.users.revokeAccess(user.uid));
+            else if (action === "revoke") await apiClient.post(apiUrls.users.revokeAccess(user.uid), {notifyUser: true});
             else await apiClient.post(apiUrls.users.resetAccess(user.uid));
 
             trigger();
