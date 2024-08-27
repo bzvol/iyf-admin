@@ -20,6 +20,18 @@ jobs:
       - name: Build
         run: yarn build
 
+      - name: Upload source map to Bugsnag
+        run: |
+          cd build/static/js
+          BUNDLE_JS=$(ls *.js)
+          npx bugsnag-source-maps upload-browser \
+            --api-key ${{ secrets.BUGSNAG_API_KEY }} \
+            --app-version 1.0.0 \
+            --bundle-url "https://admin.iyf.hu/static/js/${BUNDLE_JS}" \
+            --source-map "${BUNDLE_JS}.map" \
+            --bundle "${BUNDLE_JS}"
+          cd ../../..
+
       - name: Deploy
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
