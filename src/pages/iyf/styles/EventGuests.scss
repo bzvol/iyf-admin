@@ -20,7 +20,14 @@
   }
 
   &__guests-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     font-size: 1.2rem;
+
+    & > button {
+      align-self: flex-end;
+    }
   }
 
   &__guests {
@@ -122,6 +129,18 @@
       & tr:nth-child(16n+15), & tr:nth-child(16n+16) {
         background-color: #8b7c69;
       }
+    }
+  }
+}
+
+@media screen and (min-width: $breakpoint-sm) {
+  .EventGuests__guests-info {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    & > button {
+      align-self: auto;
     }
   }
 }

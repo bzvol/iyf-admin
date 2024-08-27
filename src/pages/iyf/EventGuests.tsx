@@ -4,7 +4,7 @@ import apiUrls, {apiClient, Event, EventGuest} from "../../api";
 import {createTriggerContext, parseISO, useCreateTrigger, useNotifications, useTrigger} from "../../utils";
 import React, {useEffect, useMemo, useRef, useState} from "react";
 import Alert from "../../components/Alert";
-import {ArrowBack, Delete, Edit} from "@mui/icons-material";
+import {ArrowBack, Delete, Edit, IosShare} from "@mui/icons-material";
 import {useMediaQuery} from "@mui/material";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import Modal from "../../components/Modal";
@@ -41,6 +41,29 @@ export default function EventGuests() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [triggerVal]);
 
+    const handleExport = () => addNotification({
+        type: 'loading',
+        messages: {
+            loading: 'Exporting guests...',
+            success: 'Guests exported successfully',
+            error: 'Failed to export guests'
+        },
+        action: async () => {
+            const res = await apiClient.get(apiUrls.events.guests.export(event.id), {responseType: 'blob'});
+            const url = window.URL.createObjectURL(new Blob([res.data],
+                {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', event.title + ' - Guests.xlsx');
+            document.body.appendChild(link);
+            link.click();
+
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        }
+    });
+
     return (
         <section className="EventGuests flex-vert-gap1">
             <h1>Guests</h1>
@@ -52,9 +75,11 @@ export default function EventGuests() {
             </Link>
             {!loaded && <Alert type="loading">Loading guests...</Alert>}
             {loaded && <div className="EventGuests__guests-info">
-                {guests.length === 0
+                <span>{!guests.length
                     ? "There are no guests registered for this event."
-                    : "Number of guests: " + guests.length}
+                    : "Number of guests: " + guests.length}</span>
+                {!!guests.length &&
+                    <button className="icon-n-text" onClick={handleExport}><IosShare/> Export to Excel</button>}
             </div>}
             <GuestsTrigger.Provider value={trigger}>
                 {loaded && guests.length > 0 &&

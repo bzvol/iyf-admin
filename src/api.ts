@@ -51,6 +51,7 @@ const apiUrls = {
             read: (eventId: number, guestId: number) => `/events/${eventId}/guests/${guestId}`, // public
             update: (eventId: number, guestId: number) => `/events/${eventId}/guests/${guestId}`,
             delete: (eventId: number, guestId: number) => `/events/${eventId}/guests/${guestId}`,
+            export: (eventId: number) => `/events/${eventId}/guests/export`
         }
     },
     regularEvents: {
