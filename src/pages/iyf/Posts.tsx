@@ -4,7 +4,7 @@ import apiUrls, {apiClient, Post, Status} from "../../api";
 import React, {useEffect, useMemo, useState} from "react";
 import {useAuth} from "../../firebase";
 import {Add, Delete, Edit, MoreVert} from "@mui/icons-material";
-import {capitalize, getFirstName, getMetadataTitle, StatusAction, StatusIcon} from './common';
+import {capitalize, getFirstName, getMetadataTitle, resourceComparator, StatusAction, StatusIcon} from './common';
 import SearchBar from '../../components/SearchBar';
 import UserPhoto from "../../components/UserPhoto";
 import ViewOnlyAlert from "../../components/ViewOnlyAlert";
@@ -31,8 +31,8 @@ export default function Posts() {
             try {
                 setLoaded(false);
                 const postsRes = await apiClient.get<Post[]>(apiUrls.posts.list);
-                setPosts(postsRes.data);
-                setFilteredPosts(postsRes.data);
+                setPosts(postsRes.data.sort(resourceComparator));
+                setFilteredPosts(postsRes.data.sort(resourceComparator));
                 setLoaded(true);
             } catch (e) {
                 addNotification({

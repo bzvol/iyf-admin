@@ -12,7 +12,7 @@ import {
     MoreVert, PeopleAlt,
     Update as EndTime
 } from "@mui/icons-material";
-import {capitalize, getFirstName, getMetadataTitle, StatusAction, StatusIcon} from './common';
+import {capitalize, getFirstName, getMetadataTitle, resourceComparator, StatusAction, StatusIcon} from './common';
 import SearchBar from '../../components/SearchBar';
 import ViewOnlyAlert from "../../components/ViewOnlyAlert";
 import UserPhoto from "../../components/UserPhoto";
@@ -46,8 +46,8 @@ export default function Events() {
             try {
                 setLoaded(false);
                 const eventsRes = await apiClient.get<Event[]>(apiUrls.events.list);
-                setEvents(eventsRes.data);
-                setFilteredEvents(eventsRes.data);
+                setEvents(eventsRes.data.sort(resourceComparator));
+                setFilteredEvents(eventsRes.data.sort(resourceComparator));
                 setLoaded(true);
             } catch (e) {
                 addNotification({

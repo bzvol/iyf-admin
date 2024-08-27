@@ -37,7 +37,7 @@ export default function IAM() {
         (async () => {
             try {
                 const res = await apiClient.get<UserWithClaims[]>(apiUrls.users.list);
-                setUsers(res.data);
+                setUsers(res.data.sort(comparator));
                 setLoaded(true);
             } catch (e) {
                 addNotification({
@@ -244,3 +244,12 @@ const rolesLabels: Record<keyof UserRoles, string> = {
     guestManager: "Guest Manager",
     accessManager: "Access Manager"
 };
+
+function getOrderByStatus(user: UserWithClaims): number {
+    if (user.customClaims.accessDenied) return 3;
+    if (user.customClaims.accessRequested) return 2;
+    if (user.customClaims.admin) return 1;
+    return 4;
+}
+
+const comparator = (a: UserWithClaims, b: UserWithClaims) => getOrderByStatus(a) - getOrderByStatus(b);

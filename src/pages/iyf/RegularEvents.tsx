@@ -8,7 +8,7 @@ import {AccessTimeFilled as Time, Add, Delete, Edit, LocationOn, MoreVert} from 
 import ViewOnlyAlert from "../../components/ViewOnlyAlert";
 import SearchBar from "../../components/SearchBar";
 import Alert from "../../components/Alert";
-import {capitalize, getFirstName, getMetadataTitle, StatusAction, StatusIcon} from "./common";
+import {capitalize, getFirstName, getMetadataTitle, resourceComparator, StatusAction, StatusIcon} from "./common";
 import UserPhoto from "../../components/UserPhoto";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import Bugsnag from "@bugsnag/js";
@@ -30,8 +30,8 @@ export default function RegularEvents() {
             try {
                 setLoaded(false);
                 const eventsRes = await apiClient.get<RegularEvent[]>(apiUrls.regularEvents.list);
-                setEvents(eventsRes.data);
-                setFilteredEvents(eventsRes.data);
+                setEvents(eventsRes.data.sort(resourceComparator));
+                setFilteredEvents(eventsRes.data.sort(resourceComparator));
                 setLoaded(true);
             } catch (e) {
                 addNotification({

@@ -33,3 +33,19 @@ export function getMetadataTitle(createdBy: User, updatedBy: User): string {
         ? `Created by ${createdBy.displayName}, updated by ${updatedBy.displayName}`
         : `Created by ${createdBy.displayName}`;
 }
+
+type ResourceComparatorElement = { status: Status, metadata: { updatedAt: string } };
+const statusOrder: Record<Status, number> = {draft: 1, published: 2, archived: 3};
+
+export function resourceComparator(a: ResourceComparatorElement, b: ResourceComparatorElement): number {
+    const statusComparison = statusOrder[a.status] - statusOrder[b.status];
+    if (statusComparison !== 0) return statusComparison;
+    return parseISO(b.metadata.updatedAt) - parseISO(a.metadata.updatedAt);
+}
+
+function parseISO(date: string) {
+    const [datePart, timePart] = date.split("T");
+    const [year, month, day] = datePart.split("-");
+    const [hour, minute] = timePart.split(":");
+    return new Date(+year, +month - 1, +day, +hour, +minute).getTime();
+}
