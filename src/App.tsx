@@ -13,6 +13,7 @@ import RegularEvents from "./pages/iyf/RegularEvents";
 import CreateRegularEvent from "./pages/iyf/CreateRegularEvent";
 import EditRegularEvent from "./pages/iyf/EditRegularEvent";
 import EventGuests from "./pages/iyf/EventGuests";
+import ReportBug from "./pages/ReportBug";
 
 export const routes = [
     {
@@ -68,6 +69,10 @@ export const routes = [
                     }
                 ]
             },
+            {
+                path: "/report-bug",
+                element: <ReportBug/>
+            }
         ],
         errorElement: <ErrorBoundary/>
     }
@@ -79,7 +84,11 @@ export default function App() {
     useEffect(() => {
         setPerfectHeight();
         window.addEventListener('resize', setPerfectHeight);
-        return () => window.removeEventListener('resize', setPerfectHeight);
+        const interval = setInterval(setPerfectHeight, 3000);
+        return () => {
+            window.removeEventListener('resize', setPerfectHeight);
+            clearInterval(interval);
+        };
     }, []);
 
     return <RouterProvider router={router}/>;

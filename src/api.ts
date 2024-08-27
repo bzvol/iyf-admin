@@ -31,6 +31,7 @@ const apiUrls = {
     images: {
         upload: '/images',
     },
+    report: '/report',
     posts: {
         list: `/posts`, // public
         create: `/posts`,

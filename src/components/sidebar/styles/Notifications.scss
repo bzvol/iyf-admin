@@ -1,6 +1,10 @@
+@import '../../../variables';
+
 .Notifications {
   color: white;
   padding: 1rem 1.5rem;
+  flex-grow: 1;
+  border-bottom: 2px solid $color-divider-1;
 }
 
 .Notifications-header {
